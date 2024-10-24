@@ -8,20 +8,25 @@
     "test": "npm run test --workspaces",
     "build": "npm run build --workspaces",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "lint": "npm run lint --workspaces"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^8.7.0",
-    "@typescript-eslint/parser": "^8.7.0",
-    "eslint": "9.13.0",
+    "@jest/globals": "^29.7.0",
+    "@typescript-eslint/eslint-plugin": "^8.11.0",
+    "@typescript-eslint/parser": "^8.11.0",
+    "eslint": "^9.13.0",
     "jsonc-eslint-parser": "^2.4.0",
     "prettier": "^3.3.3",
     "typescript": "5.5.4"
   },
   "workspaces": [
-    "packages/clients"
-  ]
+    "libs/*"
+  ],
+  "dependencies": {
+    "jest": "^29.7.0"
+  }
 }

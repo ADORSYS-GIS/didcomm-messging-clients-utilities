@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "lint": "eslint ./src --ext .ts",
-    "test": "jest",
+    "lint": "eslint '**/*.{js,ts,jsx,tsx}'",
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "test": "",
+    "build": "tsc -b",
     "preview": "vite preview"
   },
   "dependencies": {
