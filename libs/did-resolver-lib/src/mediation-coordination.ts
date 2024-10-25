@@ -19,8 +19,12 @@ export default async function Mediation_Coordinaton(anonymous: boolean, to: stri
 
 }
 
-async function build_and_pack_msg(to: string[], type: string, body: {}): Promise<string> {
-    const msg = new Message({
+export async function build_and_pack_msg(to: string[], type: string, body: {}): Promise<string> {
+    if (!to || to.length === 0) {
+        throw new Error("to is empty");
+    }
+console.log(Message);
+    const msg: Message = new Message({
         id: uuidv4(),
         typ: "application/didcomm-plain+json",
         type: type,
@@ -29,23 +33,29 @@ async function build_and_pack_msg(to: string[], type: string, body: {}): Promise
         body: body
 
     })
+    
     let did_resolver: DIDResolver = new PeerDIDResolver();
     let secret_resolver: SecretsResolver = new ExampleSecretsResolver([]);
 
-    const [packed_msg, packedMetadata] = await msg.pack_encrypted(
-        to[0],
-        From,
-        null,
-        did_resolver,
-        secret_resolver,
-        {
-            forward: false
-        }
-    )
-    return packed_msg
+    try {
+        const [packed_msg, packedMetadata] = await msg.pack_encrypted(
+            to[0],
+            From,
+            null,
+            did_resolver,
+            secret_resolver,
+            {
+                forward: false
+            }
+        )
+        return packed_msg
+    } catch (error) {
+        
+        throw error;
+    }
 }
 
-async function mediate_request(to: string[], recipient_did: string): Promise<Message> {
+export async function mediate_request(to: string[], recipient_did: string): Promise<Message> {
     let body = { "recipient_did": recipient_did }
     let type = "https://didcomm.org/coordinate-mediation/2.0/mediate-request";
     let did_resolver: DIDResolver = new PeerDIDResolver();
@@ -73,7 +83,7 @@ async function mediate_request(to: string[], recipient_did: string): Promise<Mes
     )
     return unpackedMsg
 }
-async function keylist_update(recipient_did: string, action: string, to: string[]) {
+export async function keylist_update(recipient_did: string, action: string, to: string[]) {
 
     let did_resolver: DIDResolver = new PeerDIDResolver();
     let secret_resolver: SecretsResolver = new ExampleSecretsResolver([]);
@@ -112,7 +122,7 @@ async function keylist_update(recipient_did: string, action: string, to: string[
 
 }
 
-async function keylist_query(recipient_did: string[], action: string, did: string) {
+export async function keylist_query(recipient_did: string[], action: string, did: string) {
 
     let type = "https://didcomm.org/coordinate-mediation/2.0/keylist-query";
     let did_resolver: DIDResolver = new PeerDIDResolver();
