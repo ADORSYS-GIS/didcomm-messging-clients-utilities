@@ -1,4 +1,4 @@
-import { Message } from "didcomm";
+import { IMessage, Message } from "didcomm";
 import { v4 as uuidv4 } from 'uuid';
 import PeerDIDResolver from "./resolver";
 import { DIDResolver, SecretsResolver } from "didcomm";
@@ -61,11 +61,11 @@ export async function mediate_request(to: string[], recipient_did: string): Prom
     let did_resolver: DIDResolver = new PeerDIDResolver();
     let secret_resolver: SecretsResolver = new ExampleSecretsResolver([]);
 
-    let packed_msg = build_and_pack_msg(to, type, body);
+    let packed_msg = await build_and_pack_msg(to, type, body);
 
     let data = fetch('', {
         method: 'POST',
-        body: await packed_msg,
+        body: packed_msg,
         headers: {
             'Content-Type': 'application-encrypted+json'
         },
@@ -130,7 +130,7 @@ export async function keylist_query(recipient_did: string[], action: string, did
 
     let body = {}
     let packed_msg = build_and_pack_msg(recipient_did, type, body);
-    let data = fetch('', {
+    let data = fetch('http://localhost:3000/mediate', {
         method: 'POST',
         body: await packed_msg,
         headers: {

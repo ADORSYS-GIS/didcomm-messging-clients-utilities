@@ -9,6 +9,6 @@
     "moduleResolution": "Node",
     "skipLibCheck": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "jest-puppeteer.config.js", "jest.config.puppeteer.js"],
   "exclude": ["node_modules", "dist"]
 }

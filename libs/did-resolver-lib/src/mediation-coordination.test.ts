@@ -4,10 +4,10 @@ import Mediation_Coordinaton, { build_and_pack_msg, keylist_query, keylist_updat
 import { Message } from 'didcomm';
 
 jest.mock('didcomm', () => ({
-  Message: {
+  Message: jest.fn().mockImplementation(() => ( {
     pack_encrypted: jest.fn(),
     unpack: jest.fn(),
-  },
+  })),
 }));
 
 describe('Mediation_Coordinaton', () => {
@@ -63,7 +63,7 @@ describe('build_and_pack_msg', () => {
     const pack_encrypted = jest.fn(() => Promise.resolve(['packed_msg', {}]));
 
     const result = await build_and_pack_msg(to, type, body);
-    expect(result).toBe('packed_msg');
+    expect(result).toBe(['packed_msg', {}][0]);
     expect(pack_encrypted).toHaveBeenCalledTimes(1);
   });
 });
