@@ -21,9 +21,9 @@ export default async function Mediation_Coordinaton(anonymous: boolean, to: stri
 
 export async function build_and_pack_msg(to: string[], type: string, body: {}): Promise<string> {
     if (!to || to.length === 0) {
-        throw new Error("to is empty");
+        throw new Error("to is empty"); 
     }
-console.log(Message);
+
     const msg: Message = new Message({
         id: uuidv4(),
         typ: "application/didcomm-plain+json",
