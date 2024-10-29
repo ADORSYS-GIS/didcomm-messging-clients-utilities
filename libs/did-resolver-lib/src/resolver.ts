@@ -15,8 +15,7 @@ export default class PeerDIDResolver implements DIDResolver {
       // Validate if the DID starts with the "did:peer:" prefix
       if (!did.startsWith('did:peer:')) {
         throw new Error('Unsupported DID method');
-      }
-      else if (!did.endsWith('did:peer:2')) {
+      } else if (!did.startsWith('did:peer:2')) {
         throw new Error('Unsupported DID peer Version');
       }
 

@@ -29,6 +29,7 @@ const DIDDoc = {
     },
   ],
 };
+
 describe('resolver test', () => {
   test('test did peer resolver', async () => {
     const EX_DIDDOC = new PeerDIDResolver().resolve(
@@ -36,5 +37,15 @@ describe('resolver test', () => {
     );
 
     expect(await EX_DIDDOC).toEqual(DIDDoc);
+  });
+});
+
+describe('negative resolver test', () => {
+  test('negative did peer resolver test', async () => {
+    const EX_DIDDOC = new PeerDIDResolver().resolve(
+      'did:peer:4.Ez6LSqXj3dXG5zL9bd4rUB21kDg5K6mBb5nRVArPbcAU8mX6b.Vz6Mku5fqS5Gm9iZy9nZ67uL4gJYvMMV454tmXJerWHWvp7tc.SeyJhIjpbImRpZGNvbW0vdjIiXSwiaWQiOiIjZGlkY29tbSIsInMiOiJodHRwOi8vYWxpY2UtbWVkaWF0b3IuY29tIiwidCI6ImRtIn0',
+    );
+
+    expect(await EX_DIDDOC).toEqual(null);
   });
 });
