@@ -9,11 +9,11 @@ let did_resolver: DIDResolver = new PeerDIDResolver();
 let secret_resolver: SecretsResolver = new ExampleSecretsResolver([]);
 
 
-async function forward_msg(to:string[], type: string, body: {}): Promise<string>{
+export async function forward_msg(to:string[], body: {}): Promise<string>{
     const msg = new Message({
         id: uuidv4(),
         typ: "application/didcomm-plain+json",
-        type: type,
+        type: "https://didcomm.org/routing/2.0/forward",
         from: FROM,
         to: to,
         body: body
