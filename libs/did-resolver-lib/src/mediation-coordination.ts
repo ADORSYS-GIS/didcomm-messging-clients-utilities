@@ -2,7 +2,7 @@ import { IMessage, Message } from "didcomm";
 import { v4 as uuidv4 } from 'uuid';
 import PeerDIDResolver from "./resolver";
 import { DIDResolver, SecretsResolver } from "didcomm";
-import ExampleSecretsResolver from "./Example_resolver";
+import ExampleSecretsResolver from './Example_resolver';
 
 const From = '';
 type routing_did = string;
@@ -21,7 +21,7 @@ export default async function Mediation_Coordinaton(anonymous: boolean, to: stri
 
 export async function build_and_pack_msg(to: string[], type: string, body: {}): Promise<string> {
     if (!to || to.length === 0) {
-        throw new Error("to is empty"); 
+        throw new Error("to is empty");
     }
     const val: IMessage = {
         id: "example-1",
@@ -37,28 +37,29 @@ export async function build_and_pack_msg(to: string[], type: string, body: {}): 
         created_time: 10000,
         expires_time: 20000,
         attachments: [
-          {
-            data: {
-              base64: "ZXhhbXBsZQ==",
+            {
+                data: {
+                    base64: "ZXhhbXBsZQ==",
+                },
+                id: "attachment1",
             },
-            id: "attachment1",
-          },
-          {
-            data: {
-              json: "example",
+            {
+                data: {
+                    json: "example",
+                },
+                id: "attachment2",
             },
-            id: "attachment2",
-          },
-          {
-            data: {
-              json: "example",
+            {
+                data: {
+                    json: "example",
+                },
+                id: "attachment3",
             },
-            id: "attachment3",
-          },
         ],
-      };
-    
-      const msg = new Message(val);
+    };
+
+    const msg = new Message(val);
+
     let did_resolver: DIDResolver = new PeerDIDResolver();
     let secret_resolver: SecretsResolver = new ExampleSecretsResolver([]);
 
@@ -75,7 +76,7 @@ export async function build_and_pack_msg(to: string[], type: string, body: {}): 
         )
         return packed_msg
     } catch (error) {
-        
+
         throw error;
     }
 }
