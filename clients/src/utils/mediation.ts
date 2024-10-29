@@ -1,8 +1,8 @@
-import { Message } from "didcomm";
+import { IMessage, Message } from "didcomm";
 import { v4 as uuidv4 } from 'uuid';
 import PeerDIDResolver from "./resolver";
 import { DIDResolver, SecretsResolver } from "didcomm";
-import ExampleSecretsResolver from "./Example_resolver";
+import ExampleSecretsResolver, { ExampleDIDResolver } from "./Example_resolver";
 
 const From = '';
 type routing_did = string;
@@ -24,17 +24,74 @@ export async function build_and_pack_msg(to: string[], type: string, body: {}): 
         throw new Error("to is empty"); 
     }
 
-    const msg: Message = new Message({
-        id: uuidv4(),
+    const val: IMessage = {
+        id: "example-1",
         typ: "application/didcomm-plain+json",
-        type: type,
-        from: From,
-        to: to,
-        body: body
-
-    })
+        type: "example/v1",
+        body: "example-body",
+        from: "did:example:4",
+        to: ["did:example:1", "did:example:2", "did:example:3"],
+        thid: "example-thread-1",
+        pthid: "example-parent-thread-1",
+        "example-header-1": "example-header-1-value",
+        "example-header-2": "example-header-2-value",
+        created_time: 10000,
+        expires_time: 20000,
+        attachments: [
+          {
+            data: {
+              base64: "ZXhhbXBsZQ==",
+            },
+            id: "attachment1",
+          },
+          {
+            data: {
+              json: "example",
+            },
+            id: "attachment2",
+          },
+          {
+            data: {
+              json: "example",
+            },
+            id: "attachment3",
+          },
+        ],
+      };
     
-    let did_resolver: DIDResolver = new PeerDIDResolver();
+      const msg = new Message(val);
+      
+      const DIDDoc = {
+        id: 'did:peer:2.Ez6LSqXj3dXG5zL9bd4rUB21kDg5K6mBb5nRVArPbcAU8mX6b.Vz6Mku5fqS5Gm9iZy9nZ67uL4gJYvMMV454tmXJerWHWvp7tc.SeyJhIjpbImRpZGNvbW0vdjIiXSwiaWQiOiIjZGlkY29tbSIsInMiOiJodHRwOi8vYWxpY2UtbWVkaWF0b3IuY29tIiwidCI6ImRtIn0',
+        keyAgreement: ['#key-1'],
+        authentication: ['#key-2'],
+        verificationMethod: [
+          {
+            id: '#key-1',
+            type: 'Multikey',
+            controller:
+              'did:peer:2.Ez6LSqXj3dXG5zL9bd4rUB21kDg5K6mBb5nRVArPbcAU8mX6b.Vz6Mku5fqS5Gm9iZy9nZ67uL4gJYvMMV454tmXJerWHWvp7tc.SeyJhIjpbImRpZGNvbW0vdjIiXSwiaWQiOiIjZGlkY29tbSIsInMiOiJodHRwOi8vYWxpY2UtbWVkaWF0b3IuY29tIiwidCI6ImRtIn0',
+            publicKeyMultibase: 'zz6LSqXj3dXG5zL9bd4rUB21kDg5K6mBb5nRVArPbcAU8mX6b',
+          },
+          {
+            id: '#key-2',
+            type: 'Multikey',
+            controller:
+              'did:peer:2.Ez6LSqXj3dXG5zL9bd4rUB21kDg5K6mBb5nRVArPbcAU8mX6b.Vz6Mku5fqS5Gm9iZy9nZ67uL4gJYvMMV454tmXJerWHWvp7tc.SeyJhIjpbImRpZGNvbW0vdjIiXSwiaWQiOiIjZGlkY29tbSIsInMiOiJodHRwOi8vYWxpY2UtbWVkaWF0b3IuY29tIiwidCI6ImRtIn0',
+            publicKeyMultibase: 'zz6Mku5fqS5Gm9iZy9nZ67uL4gJYvMMV454tmXJerWHWvp7tc',
+          },
+        ],
+        service: [
+          {
+            id: '#didcomm',
+            type: 'DIDCommMessaging',
+            serviceEndpoint: 'http://alice-mediator.com',
+          },
+        ],
+      };
+      
+
+    let did_resolver: DIDResolver = new ExampleDIDResolver([DIDDoc])
     let secret_resolver: SecretsResolver = new ExampleSecretsResolver([]);
 
     try {
