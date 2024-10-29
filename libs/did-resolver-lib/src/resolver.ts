@@ -15,7 +15,10 @@ export default class PeerDIDResolver implements DIDResolver {
       // Validate if the DID starts with the "did:peer:" prefix
       if (!did.startsWith('did:peer:')) {
         throw new Error('Unsupported DID method');
-      }
+       }
+       //else if (!did.endsWith('did:peer:2')) {
+      //   throw new Error('Unsupported DID peer Version');
+      // }
 
       // Dissect the DID address
       const chain = did
@@ -73,7 +76,7 @@ export default class PeerDIDResolver implements DIDResolver {
 
           if (!service.id) {
             service.id =
-              serviceNextId === 0 ? '#didcomm' : `#didcomm-${serviceNextId}`;
+              serviceNextId === 0 ? '#service' : `#service-${serviceNextId}`;
             serviceNextId++;
           }
 
