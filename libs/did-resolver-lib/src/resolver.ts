@@ -16,9 +16,9 @@ export default class PeerDIDResolver implements DIDResolver {
       if (!did.startsWith('did:peer:')) {
         throw new Error('Unsupported DID method');
       }
-      //else if (!did.endsWith('did:peer:2')) {
-      //   throw new Error('Unsupported DID peer Version');
-      // }
+      else if (!did.endsWith('did:peer:2')) {
+        throw new Error('Unsupported DID peer Version');
+      }
 
       // Dissect the DID address
       const chain = did
