@@ -15,6 +15,8 @@ export default class PeerDIDResolver implements DIDResolver {
       // Validate if the DID starts with the "did:peer:" prefix
       if (!did.startsWith('did:peer:')) {
         throw new Error('Unsupported DID method');
+      } else if (!did.startsWith('did:peer:2')) {
+        throw new Error('Unsupported DID peer Version');
       }
 
       // Dissect the DID address
@@ -30,6 +32,7 @@ export default class PeerDIDResolver implements DIDResolver {
 
       const authentication: string[] = [];
       const keyAgreement: string[] = [];
+      const assertionMethod: string[] = [];
       const verificationMethods: VerificationMethod[] = [];
 
       chain
@@ -40,6 +43,8 @@ export default class PeerDIDResolver implements DIDResolver {
 
           switch (purpose) {
             case 'Assertion':
+              assertionMethod.push(id);
+              break;
             case 'Verification':
               authentication.push(id);
               break;
@@ -50,7 +55,7 @@ export default class PeerDIDResolver implements DIDResolver {
 
           const method: VerificationMethod = {
             id,
-            type: 'Ed25519VerificationKey2018',
+            type: 'Multikey',
             controller: did,
             publicKeyMultibase: `z${multikey}`,
           };
@@ -94,12 +99,14 @@ export default class PeerDIDResolver implements DIDResolver {
 }
 
 function reverseAbbreviateService(decodedService: string): Service {
+  const parsed = JSON.parse(decodedService);
   return {
-    id: '',
-    type: 'SomeServiceType',
-    serviceEndpoint: decodedService,
+    id: parsed.id || '',
+    type: 'DIDCommMessaging',
+    serviceEndpoint: parsed.s,
   };
 }
+
 function mapPurposeFromCode(code: string): Purpose {
   switch (code) {
     case 'A':

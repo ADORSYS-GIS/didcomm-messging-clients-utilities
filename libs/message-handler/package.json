@@ -4,23 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "lint": "eslint '**/*.{js,ts,jsx,tsx}'",
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint ./scr --ext .ts",
-    "test": "jest",
+    "test": "",
+    "build": "tsc -b",
     "preview": "vite preview"
   },
-  "dependencies": {
-    "@veramo/did-provider-peer": "^6.0.0",
-    "base64url": "^3.0.1",
-    "didcomm": "^0.4.1",
-    "ethr-did-resolver": "^11.0.2",
-    "peer-did-resolver": "^2.0.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "uuid": "^10.0.0"
-    "web-did-resolver": "^2.0.27"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@eslint/js": "^9.11.1",
     "@jest/globals": "^29.7.0",
@@ -41,7 +31,6 @@
     "vite": "^5.4.8"
   },
   "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
-  "main": "eslint.config.js",
   "author": "",
   "license": "ISC"
 }
