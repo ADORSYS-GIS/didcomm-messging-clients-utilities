@@ -1,8 +1,8 @@
 import { DIDResolver, Message, SecretsResolver } from "didcomm";
 import { v4 as uuidv4 } from 'uuid';
 import axios from "axios";
-import PeerDIDResolver from "./resolver";
-import ExampleSecretsResolver from "./Example_resolver";
+import PeerDIDResolver from "../../did-resolver-lib/src/resolver";
+import { ExampleSecretsResolver } from "../../did-resolver-lib/src/ExampleDIDResolver";
 
 const FROM = '';
 let did_resolver: DIDResolver = new PeerDIDResolver();
