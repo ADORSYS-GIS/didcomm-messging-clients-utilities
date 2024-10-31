@@ -5,8 +5,6 @@ export default {
   transform: {
     '^.+.ts?$': ['ts-jest', 'babel-jest', {}],
   },
-  transformIgnorePatterns: [
-    "/node_modules/(?!(didcomm)/)"
-  ],
+  transformIgnorePatterns: ['/node_modules/(?!(didcomm)/)'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 };

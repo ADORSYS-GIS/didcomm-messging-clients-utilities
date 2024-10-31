@@ -20,5 +20,8 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "../did-resolver-lib/src/forward.test.ts/src/forward.test.ts"]
+  "include": [
+    "src",
+    "../did-resolver-lib/src/forward.test.ts/src/forward.test.ts"
+  ]
 }

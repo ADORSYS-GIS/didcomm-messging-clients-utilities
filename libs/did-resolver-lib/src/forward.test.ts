@@ -1,4 +1,4 @@
-import { forward_msg } from '../../message-handler/src/forward-client'; 
+import { forward_msg } from '../../message-handler/src/forward-client';
 import { describe, expect, jest, test } from '@jest/globals';
 
 jest.mock('didcomm', () => ({
@@ -6,7 +6,6 @@ jest.mock('didcomm', () => ({
     pack_encrypted: jest.fn(),
   })),
 }));
-
 
 jest.mock('axios');
 const axios = require('axios');
@@ -24,10 +23,10 @@ describe('Forward Client Tests', () => {
       content: message.content,
     };
 
-    axios.post.mockResolvedValue({ status: 200 }); 
-    const result = await forward_msg(message.to, body); 
+    axios.post.mockResolvedValue({ status: 200 });
+    const result = await forward_msg(message.to, body);
     console.log('Result for valid message:', result);
-    expect(result).toBe("Messages sent to recipient");
+    expect(result).toBe('Messages sent to recipient');
   });
 
   test('should handle forwarding to invalid DID', async () => {
@@ -43,5 +42,5 @@ describe('Forward Client Tests', () => {
     };
 
     //await expect(forward_msg(invalidMessage.to, body)).rejects.toThrow('Invalid DID');
-});
+  });
 });
