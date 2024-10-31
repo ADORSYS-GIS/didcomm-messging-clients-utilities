@@ -3,17 +3,27 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "workspaces": [
+    "libs/message-handler",
+    "libs/did-resolver-lib"
+  ],
   "scripts": {
     "lint": "eslint '**/*.{js,ts,jsx,tsx}'",
     "dev": "vite",
     "test": "",
     "build": "tsc -b",
+    "clean": "rimraf dist",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "preview": "vite preview"
   },
-  "dependencies": {},
+  "dependencies": {
+    "axios": "^1.7.7"
+  },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
     "@jest/globals": "^29.7.0",
+    "@types/axios": "^0.14.4",
     "@types/node": "^22.7.6",
     "@types/react": "^18.3.10",
     "@types/react-dom": "^18.3.0",
