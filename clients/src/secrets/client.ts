@@ -2,7 +2,7 @@ import { Secret } from "didcomm";
 
 export const CLIENT_SECRETS: Secret[] = [
   {
-    id: "did:key:z6MkrQT3VKYGkbPaYuJeBv31gNgpmVtRWP5yTocLDBgPpayM",
+    id: "#key-1",
     type: "JsonWebKey2020",
     privateKeyJwk: {
       crv: "Ed25519",
@@ -12,7 +12,7 @@ export const CLIENT_SECRETS: Secret[] = [
     },
   },
   {
-    id: "did:key:z6MkrQT3VKYGkbPaYuJeBv31gNgpmVtRWP5yTocLDBgPpayM#key-1",
+    id: "#key-2",
     type: "JsonWebKey2020",
     privateKeyJwk: {
       crv: "X25519",

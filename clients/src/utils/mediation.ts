@@ -1,9 +1,8 @@
-import { IMessage, Message } from "didcomm";
+import { DIDDoc, IMessage, Message } from "didcomm";
 import PeerDIDResolver from "./resolver";
 import { DIDResolver, SecretsResolver } from "didcomm";
 import ExampleSecretsResolver, { ExampleDIDResolver } from "./Example_resolver";
-import { CLIENT_SECRETS} from "../secrets/client";
-import { CLIENT_DIDDOC, MEDIATOR_DIDDOC } from "../diddoc/constants";
+import { CLIENT_SECRETS } from "../secrets/client";
 import { MEDIATE_REQUEST } from "../protocols/message_types";
 
 // Declaring the routing did
@@ -29,8 +28,8 @@ export async function build_and_pack_msg(to: string[], type: string, body: {}): 
     throw new Error("to is empty");
   }
 
-  const TO = "did:peer:2.Vz6Mkf6r1uMJwoRAbzkuyj2RwPusdZhWSPeEknnTcKv2C2EN7.Ez6LSgbP4b3y8HVWG6C73WF2zLbzjDAPXjc33P2VfnVVHE347.SeyJpZCI6IiNkaWRjb21tIiwicyI6eyJhIjpbImRpZGNvbW0vdjIiXSwiciI6W10sInVyaSI6Imh0dHA6Ly9hbGljZS1tZWRpYXRvci5jb20ifSwidCI6ImRtIn0";
-const From = "did:key:z6MkrQT3VKYGkbPaYuJeBv31gNgpmVtRWP5yTocLDBgPpayM";
+  const From = "did:peer:2.Vz6Mkf6r1uMJwoRAbzkuyj2RwPusdZhWSPeEknnTcKv2C2EN7.Ez6LSgbP4b3y8HVWG6C73WF2zLbzjDAPXjc33P2VfnVVHE347.SeyJpZCI6IiNkaWRjb21tIiwicyI6eyJhIjpbImRpZGNvbW0vdjIiXSwiciI6W10sInVyaSI6Imh0dHA6Ly9hbGljZS1tZWRpYXRvci5jb20ifSwidCI6ImRtIn0";
+  const TO = "did:peer:2.Vz6Mkii128jM3gpxK5jeFSv4XfByfFeNDmpNXsygco5f3CMES.Ez6Mkuwe9RVZH5cgfDgUvTtQBpwgMaL3mmGzKj8Xs5r5RiBdK.SeyJ0IjoiZG0iLCJzIjp7InVyaSI6Imh0dHA6Ly9leGFtcGxlLmNvbS9kaWRjb21tIiwiYSI6WyJkaWRjb21tL3YyIl0sInIiOlsiZGlkOnBlZXI6Mi5WejZNa2lpMTI4ak0zZ3B4SzVqZUZTdjRYZkJ5ZkZlTkRtcE5Yc3lnY281ZjNDTUVTLkV6Nk1rdXdlOVJWWkg1Y2dmRGdVdlR0UUJwd2dNYUwzbW1HektqOFhzNXI1UmlCZEsja2V5LTEiXX19";
 
   const val: IMessage = {
     id: "example-1",
@@ -48,8 +47,10 @@ const From = "did:key:z6MkrQT3VKYGkbPaYuJeBv31gNgpmVtRWP5yTocLDBgPpayM";
   };
 
   const msg = new Message(val);
-
-  let did_resolver: DIDResolver = new PeerDIDResolver();//new ExampleDIDResolver([CLIENT_DIDDOC, MEDIATOR_DIDDOC]);
+  let CLIENT_DIDDOC: DIDDoc | null = await new PeerDIDResolver().resolve(From);
+  let MEDIATOR_DIDDOC: DIDDoc | null = await new PeerDIDResolver().resolve(TO);
+  //new PeerDIDResolver([MEDIATOR_DIDDOC, CLIENT_DIDDOC])
+  let did_resolver: DIDResolver = new ExampleDIDResolver([CLIENT_DIDDOC as DIDDoc, MEDIATOR_DIDDOC as DIDDoc]);
   let secret_resolver: SecretsResolver = new ExampleSecretsResolver(CLIENT_SECRETS);
 
   try {
@@ -70,15 +71,15 @@ const From = "did:key:z6MkrQT3VKYGkbPaYuJeBv31gNgpmVtRWP5yTocLDBgPpayM";
   }
 }
 
-  /**
-   * @function mediate_request
-   * @description Build and pack a mediation request message,
-   * and send it to the mediator. Unpack the response and return
-   * the unpacked message.
-   * @param {string[]} to - The recipient DID(s) of the message
-   * @param {string} recipient_did - The recipient DID of the mediation request
-   * @returns {Promise<Message>}
-   */
+/**
+ * @function mediate_request
+ * @description Build and pack a mediation request message,
+ * and send it to the mediator. Unpack the response and return
+ * the unpacked message.
+ * @param {string[]} to - The recipient DID(s) of the message
+ * @param {string} recipient_did - The recipient DID of the mediation request
+ * @returns {Promise<Message>}
+ */
 export async function mediate_request(to: string[], recipient_did: string): Promise<Message> {
 
   let body = { "recipient_did": recipient_did }
