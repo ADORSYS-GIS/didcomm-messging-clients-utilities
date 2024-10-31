@@ -52,10 +52,20 @@ export default class PeerDIDResolver implements DIDResolver {
               keyAgreement.push(id);
               break;
           }
+          let type = 'Multikey';
+          if (purpose === 'Verification') {
+            type = 'Ed25519VerificationKey2020';
+            authentication.push(id);
+          } else if (purpose === 'Encryption') {
+            type = 'X25519KeyAgreementKey2020';
+            keyAgreement.push(id);
+          } else if (purpose === 'Assertion') {
+            assertionMethod.push(id);
+          }
 
           const method: VerificationMethod = {
             id,
-            type: 'Multikey',
+            type: type,
             controller: did,
             publicKeyMultibase: `z${multikey}`,
           };
