@@ -50,36 +50,32 @@ export default class PeerDIDResolver implements DIDResolver {
 
       const authentication: string[] = [];
       const keyAgreement: string[] = [];
-      const assertionMethod: string[] = [];
       const verificationMethods: VerificationMethod[] = [];
 
-      chain
-        .filter(({ purpose }) => purpose !== 'Service')
-        .forEach((item, index) => {
-          const id = `#key-${index + 1}`;
-          const { purpose, multikey } = item;
+      chain.forEach((item, index) => {
+        const id = `#key-${index + 1}`;
+        const { purpose, multikey } = item;
 
-          switch (purpose) {
-            case 'Assertion':
-              assertionMethod.push(id);
-              break;
-            case 'Verification':
-              authentication.push(id);
-              break;
-            case 'Encryption':
-              keyAgreement.push(id);
-              break;
-          }
+        let type = '';
+        if (purpose === 'Verification') {
+          if (!authentication.includes(id)) authentication.push(id);
+          type = 'Ed25519VerificationKey2020';
+        } else if (purpose === 'Encryption') {
+          if (!keyAgreement.includes(id)) keyAgreement.push(id);
+          type = 'X25519KeyAgreementKey2020';
+        }
 
+        // Only add to verificationMethods if type is non-empty
+        if (type) {
           const method: VerificationMethod = {
             id,
-            type: 'X25519KeyAgreementKey2019',
+            type: type,
             controller: did,
-            publicKeyMultibase: `z${multikey}`,
+            publicKeyMultibase: multikey,  // Use multikey directly without adding "z" prefix
           };
-
           verificationMethods.push(method);
-        });
+        }
+      });
 
       const services: Service[] = [];
       let serviceNextId = 0;
@@ -91,7 +87,7 @@ export default class PeerDIDResolver implements DIDResolver {
           const service = reverseAbbreviateService(decodedService);
 
           if (!service.id) {
-            service.id = serviceNextId === 0 ? '#service' : `#service-${serviceNextId}`;
+            service.id = serviceNextId === 0 ? '#didcomm' : `#didcomm-${serviceNextId}`;
             serviceNextId++;
           }
 

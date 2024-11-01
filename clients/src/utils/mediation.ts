@@ -4,9 +4,10 @@ import { DIDResolver, SecretsResolver } from "didcomm";
 import ExampleSecretsResolver, { ExampleDIDResolver } from "./Example_resolver";
 import { CLIENT_SECRETS } from "../secrets/client";
 import { MEDIATE_REQUEST } from "../protocols/message_types";
+import { FROM } from "../shared_data/constants";
+import { Fragment } from "react/jsx-runtime";
 
-// Declaring the routing did
-let ROUTINGDID;
+
 export default async function Mediation_Coordinaton(to: string[], recipient_did: string, action: string): Promise<string | undefined> {
 
   // First Step to Mediation Coordination
@@ -28,16 +29,13 @@ export async function build_and_pack_msg(to: string[], type: string, body: {}): 
     throw new Error("to is empty");
   }
 
-  const From = "did:peer:2.Vz6Mkf6r1uMJwoRAbzkuyj2RwPusdZhWSPeEknnTcKv2C2EN7.Ez6LSgbP4b3y8HVWG6C73WF2zLbzjDAPXjc33P2VfnVVHE347.SeyJpZCI6IiNkaWRjb21tIiwicyI6eyJhIjpbImRpZGNvbW0vdjIiXSwiciI6W10sInVyaSI6Imh0dHA6Ly9hbGljZS1tZWRpYXRvci5jb20ifSwidCI6ImRtIn0";
-  const TO = "did:peer:2.Vz6Mkii128jM3gpxK5jeFSv4XfByfFeNDmpNXsygco5f3CMES.Ez6Mkuwe9RVZH5cgfDgUvTtQBpwgMaL3mmGzKj8Xs5r5RiBdK.SeyJ0IjoiZG0iLCJzIjp7InVyaSI6Imh0dHA6Ly9leGFtcGxlLmNvbS9kaWRjb21tIiwiYSI6WyJkaWRjb21tL3YyIl0sInIiOlsiZGlkOnBlZXI6Mi5WejZNa2lpMTI4ak0zZ3B4SzVqZUZTdjRYZkJ5ZkZlTkRtcE5Yc3lnY281ZjNDTUVTLkV6Nk1rdXdlOVJWWkg1Y2dmRGdVdlR0UUJwd2dNYUwzbW1HektqOFhzNXI1UmlCZEsja2V5LTEiXX19";
-
   const val: IMessage = {
-    id: "example-1",
+    id: "uuid",
     typ: "application/didcomm-plain+json",
     type: "example/v1",
     body: "example-body",
-    from: From,
-    to: [TO],
+    from: FROM,
+    to: to,
     pthid: "example-parent-thread-1",
     "example-header-1": "example-header-1-value",
     "example-header-2": "example-header-2-value",
@@ -47,16 +45,16 @@ export async function build_and_pack_msg(to: string[], type: string, body: {}): 
   };
 
   const msg = new Message(val);
-  let CLIENT_DIDDOC: DIDDoc | null = await new PeerDIDResolver().resolve(From);
-  let MEDIATOR_DIDDOC: DIDDoc | null = await new PeerDIDResolver().resolve(TO);
-  //new PeerDIDResolver([MEDIATOR_DIDDOC, CLIENT_DIDDOC])
+  let CLIENT_DIDDOC: DIDDoc | null = await new PeerDIDResolver().resolve(FROM);
+  let MEDIATOR_DIDDOC: DIDDoc | null = await new PeerDIDResolver().resolve(to[0]);
+
   let did_resolver: DIDResolver = new ExampleDIDResolver([CLIENT_DIDDOC as DIDDoc, MEDIATOR_DIDDOC as DIDDoc]);
   let secret_resolver: SecretsResolver = new ExampleSecretsResolver(CLIENT_SECRETS);
 
   try {
     const [packed_msg, _] = await msg.pack_encrypted(
-      TO,
-      From,
+      to[0],
+      FROM,
       null,
       did_resolver,
       secret_resolver,
@@ -82,15 +80,17 @@ export async function build_and_pack_msg(to: string[], type: string, body: {}): 
  */
 export async function mediate_request(to: string[], recipient_did: string): Promise<Message> {
 
-  let body = { "recipient_did": recipient_did }
+  let body = {}
   let type = MEDIATE_REQUEST;
-  let did_resolver: DIDResolver = new PeerDIDResolver();
-  let secret_resolver: SecretsResolver = new ExampleSecretsResolver([]);
+
+  let DIDDoc = await new PeerDIDResolver().resolve(to[0]);
+  let did_resolver: DIDResolver = new ExampleDIDResolver([DIDDoc as DIDDoc]);
+  let secret_resolver: SecretsResolver = new ExampleSecretsResolver(CLIENT_SECRETS);
 
   let packed_msg = await build_and_pack_msg(to, type, body);
 
   let data = fetch('https://927f-145-224-72-143.ngrok-free.app/', {
-    method: 'GET',
+    method: 'POST',
     body: packed_msg,
     headers: {
       'Content-Type': 'application/didcomm-encrypted+json'
