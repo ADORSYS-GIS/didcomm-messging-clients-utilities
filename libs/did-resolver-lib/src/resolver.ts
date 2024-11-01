@@ -97,8 +97,8 @@ export default class PeerDIDResolver implements DIDResolver {
       };
 
       return diddoc;
-    } catch (error: any) {
-      Error(error);
+    } catch (error: string | unknown) {
+      Error(error as string);
       return null;
     }
   }
