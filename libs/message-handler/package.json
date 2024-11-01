@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint '**/*.{js,ts,jsx,tsx}'",
     "dev": "vite",
-    "test": "",
+    "test": "jest",
     "build": "tsc -b",
     "preview": "vite preview"
   },
