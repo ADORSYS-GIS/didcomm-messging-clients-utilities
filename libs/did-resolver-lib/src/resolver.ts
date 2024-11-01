@@ -16,7 +16,7 @@ export default class PeerDIDResolver implements DIDResolver {
       if (!did.startsWith('did:peer:')) {
         throw new Error('Unsupported DID method');
       } else if (!did.startsWith('did:peer:2')) {
-        throw new Error('Unsupported DID peer Version');
+        Error('Unsupported DID peer Version');
       }
 
       // Dissect the DID address
@@ -38,36 +38,32 @@ export default class PeerDIDResolver implements DIDResolver {
       chain
         .filter(({ purpose }) => purpose !== 'Service')
         .forEach((item, index) => {
-          const id = `#key-${index + 1}`;
+          const id = `${did}-#key-${index + 1}`;
           const { purpose, multikey } = item;
 
+          let type: string;
           switch (purpose) {
             case 'Assertion':
+              type = 'Multikey';
               assertionMethod.push(id);
               break;
             case 'Verification':
+              type = 'Ed25519VerificationKey2020';
               authentication.push(id);
               break;
             case 'Encryption':
+              type = 'X25519KeyAgreementKey2020';
               keyAgreement.push(id);
               break;
-          }
-          let type = 'Multikey';
-          if (purpose === 'Verification') {
-            type = 'Ed25519VerificationKey2020';
-            authentication.push(id);
-          } else if (purpose === 'Encryption') {
-            type = 'X25519KeyAgreementKey2020';
-            keyAgreement.push(id);
-          } else if (purpose === 'Assertion') {
-            assertionMethod.push(id);
+            default:
+              type = 'Multikey';
           }
 
           const method: VerificationMethod = {
             id,
-            type: type,
+            type,
             controller: did,
-            publicKeyMultibase: `z${multikey}`,
+            publicKeyMultibase: `${multikey}`,
           };
 
           verificationMethods.push(method);
@@ -101,8 +97,8 @@ export default class PeerDIDResolver implements DIDResolver {
       };
 
       return diddoc;
-    } catch (error) {
-      console.error('Error resolving DID:', error);
+    } catch (error: any) {
+      Error(error);
       return null;
     }
   }
