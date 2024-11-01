@@ -31,7 +31,8 @@
     "typescript": "5.5.4"
   },
   "workspaces": [
-    "libs/*"
+    "libs/did-resolver-lib",
+    "libs/message-handler"
   ],
   "dependencies": {
     "jest": "^29.7.0",

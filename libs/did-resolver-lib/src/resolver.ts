@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import { DIDDoc, DIDResolver, Service, VerificationMethod } from 'didcomm';
 import base64url from 'base64url';
 
@@ -10,16 +11,33 @@ type Purpose =
   | 'Service';
 
 export default class PeerDIDResolver implements DIDResolver {
+  private diddocs: DIDDoc[];
+
+  constructor(diddocs: DIDDoc[] = []) {
+    this.diddocs = diddocs;
+  }
+
+  static default(): PeerDIDResolver {
+    return new PeerDIDResolver([
+      {
+        id: '',
+        keyAgreement: [],
+        authentication: [],
+        verificationMethod: [],
+        service: []
+      }
+    ]);
+  }
+
   async resolve(did: string): Promise<DIDDoc | null> {
     try {
-      // Validate if the DID starts with the "did:peer:" prefix
+      const existingDIDDoc = this.diddocs.find(doc => doc.id === did);
+      if (existingDIDDoc) return existingDIDDoc;
+
       if (!did.startsWith('did:peer:')) {
         throw new Error('Unsupported DID method');
-      } else if (!did.startsWith('did:peer:2')) {
-        throw new Error('Unsupported DID peer Version');
       }
 
-      // Dissect the DID address
       const chain = did
         .replace(/^did:peer:2\./, '')
         .split('.')
@@ -32,50 +50,44 @@ export default class PeerDIDResolver implements DIDResolver {
 
       const authentication: string[] = [];
       const keyAgreement: string[] = [];
-      const assertionMethod: string[] = [];
       const verificationMethods: VerificationMethod[] = [];
 
-      chain
-        .filter(({ purpose }) => purpose !== 'Service')
-        .forEach((item, index) => {
-          const id = `#key-${index + 1}`;
-          const { purpose, multikey } = item;
+      chain.forEach((item, index) => {
+        const id = `#key-${index + 1}`;
+        const { purpose, multikey } = item;
 
-          switch (purpose) {
-            case 'Assertion':
-              assertionMethod.push(id);
-              break;
-            case 'Verification':
-              authentication.push(id);
-              break;
-            case 'Encryption':
-              keyAgreement.push(id);
-              break;
-          }
+        let type = '';
+        if (purpose === 'Verification') {
+          if (!authentication.includes(id)) authentication.push(id);
+          type = 'Ed25519VerificationKey2020';
+        } else if (purpose === 'Encryption') {
+          if (!keyAgreement.includes(id)) keyAgreement.push(id);
+          type = 'X25519KeyAgreementKey2020';
+        }
 
+        // Only add to verificationMethods if type is non-empty
+        if (type) {
           const method: VerificationMethod = {
             id,
-            type: 'Multikey',
+            type: type,
             controller: did,
-            publicKeyMultibase: `z${multikey}`,
+            publicKeyMultibase: multikey,  // Use multikey directly without adding "z" prefix
           };
-
           verificationMethods.push(method);
-        });
+        }
+      });
 
-      // Resolve services
       const services: Service[] = [];
       let serviceNextId = 0;
 
       chain
         .filter(({ purpose }) => purpose === 'Service')
         .forEach(({ multikey }) => {
-          const decodedService = base64url.decode(multikey);
+          const decodedService = Buffer.from(multikey, 'base64').toString('utf-8');
           const service = reverseAbbreviateService(decodedService);
 
           if (!service.id) {
-            service.id =
-              serviceNextId === 0 ? '#service' : `#service-${serviceNextId}`;
+            service.id = serviceNextId === 0 ? '#service' : `#service-${serviceNextId}`;
             serviceNextId++;
           }
 
@@ -90,6 +102,7 @@ export default class PeerDIDResolver implements DIDResolver {
         service: services,
       };
 
+      this.diddocs.push(diddoc);
       return diddoc;
     } catch (error) {
       console.error('Error resolving DID:', error);
