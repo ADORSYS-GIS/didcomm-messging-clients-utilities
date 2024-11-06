@@ -29,6 +29,7 @@
   "dependencies": {
     "base64url": "^3.0.1",
     "jest": "^29.7.0",
+    "vite-plugin-wasm": "^3.3.0",
     "vitest": "^2.1.4"
   }
 }
