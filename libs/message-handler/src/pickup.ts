@@ -1,9 +1,12 @@
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import { Message, PackEncryptedOptions, UnpackOptions } from 'didcomm';
-export { sendPickupRequest, sendPickupDeliveryRequest, sendPickupMessageReceived };
+import { DIDDoc, Message, PackEncryptedOptions, UnpackOptions } from 'didcomm';
 import { ExampleDIDResolver, ExampleSecretsResolver } from '../../did-resolver-lib/src/ExampleDIDResolver';
-import { ALICE_DID, PICKUP_REQUEST_3_0 } from './constants/message-type';
+import PeerDIDResolver from '../../did-resolver-lib/src/resolver';
+
+import { ALICE_DID, PICKUP_DELIVERY_3_0, PICKUP_RECEIVE_3_0, PICKUP_REQUEST_3_0, SERVICE_ENDPOINT } from './constants/message-type';
+import { CLIENT_SECRETS } from './secrets/client';
+import { FROM } from './did/client';
 
 
 const buildPickupRequestMessage = async (to: string, recipient_did: string): Promise<Message> => {
@@ -11,7 +14,7 @@ const buildPickupRequestMessage = async (to: string, recipient_did: string): Pro
     id: `urn:uuid:${uuidv4()}`,
     typ: "application/didcomm-plain+json",
     type: PICKUP_REQUEST_3_0,
-    from: ALICE_DID,
+    from: FROM,
     to: [to],
     body: {
       recipient_did: recipient_did,
@@ -20,34 +23,39 @@ const buildPickupRequestMessage = async (to: string, recipient_did: string): Pro
   });
 };
 // Function to send a pickup request
-const sendPickupRequest = async (recipientDid: string, to: string): Promise<void> => {
+const sendPickupRequest = async (recipientDid: string, to: string): Promise<Message | null> => {
   try {
+    const MEDIDOC = await new PeerDIDResolver().resolve(to)
+    const did_resolver = new ExampleDIDResolver([MEDIDOC as DIDDoc]);
+    const secrets_resolver = new ExampleSecretsResolver(CLIENT_SECRETS);
     const msg = await buildPickupRequestMessage(to, recipientDid);
     const options: PackEncryptedOptions = { forward: false };
     const encryptedMsg = await msg.pack_encrypted(
-      recipientDid,
-      ALICE_DID,
+      to,
+      FROM,
       null,
-      didResolver,
-      secretsResolver,
+      did_resolver,
+      secrets_resolver,
       options
     );
-    const response = await axios.post(mediationEndpoint, encryptedMsg, {
+    console.log(encryptedMsg[0])
+    await axios.post(SERVICE_ENDPOINT, encryptedMsg[0], {
       headers: { 'Content-Type': 'application/didcomm-encrypted+json' }
     });
-    await handleUnpackResponse(response.data);
+    const message = await handleUnpackResponse(to, recipientDid);
+    return message
   } catch (error) {
-    console.error("Error during pickup request:", (error as Error).message);
+    throw Error(error as string)
   }
 };
 // Function to build a pickup delivery request message
-const buildPickupDeliveryRequestMessage = async (recipientDid: string): Promise<Message> => {
+const buildPickupDeliveryRequestMessage = async (recipientDid: string, to: string): Promise<Message> => {
   return new Message({
     id: `urn:uuid:${uuidv4()}`,
     typ: "application/didcomm-plain+json",
     type: PICKUP_DELIVERY_3_0,
-    from: ALICE_DID,
-    to: [recipientDid],
+    from: FROM,
+    to: [to],
     body: {
       recipient_did: recipientDid,
     },
@@ -55,24 +63,30 @@ const buildPickupDeliveryRequestMessage = async (recipientDid: string): Promise<
   });
 };
 // Function to send a pickup delivery request
-const sendPickupDeliveryRequest = async (recipientDid: string, mediationEndpoint: string): Promise<void> => {
+const sendPickupDeliveryRequest = async (recipientDid: string, to: string): Promise<Message | null> => {
   try {
-    const msg = await buildPickupDeliveryRequestMessage(recipientDid);
+
+    const MEDIDOC = await new PeerDIDResolver().resolve(to)
+    const did_resolver = new ExampleDIDResolver([MEDIDOC as DIDDoc]);
+    const secrets_resolver = new ExampleSecretsResolver(CLIENT_SECRETS);
+
+    const msg = await buildPickupDeliveryRequestMessage(to, recipientDid);
     const options: PackEncryptedOptions = { forward: false };
-    const [encryptedMsg] = await msg.pack_encrypted(
-      recipientDid,
-      ALICE_DID,
+    const encryptedMsg = await msg.pack_encrypted(
+      to,
+      FROM,
       null,
-      didResolver,
-      secretsResolver,
+      did_resolver,
+      secrets_resolver,
       options
     );
-    const response = await axios.post(mediationEndpoint, encryptedMsg, {
+    const response = await axios.post(SERVICE_ENDPOINT, encryptedMsg[0], {
       headers: { 'Content-Type': 'application/didcomm-encrypted+json' }
     });
-    await handleUnpackResponse(response.data);
+    const message = await handleUnpackResponse(to, response.data);
+    return message
   } catch (error) {
-    console.error("Error during pickup delivery request:", (error as Error).message);
+    throw Error(error as string)
   }
 };
 // Function to build a pickup message received message
@@ -90,43 +104,45 @@ const buildPickupMessageReceivedMessage = async (recipientDid: string, messageId
   });
 };
 // Function to send a pickup message received
-const sendPickupMessageReceived = async (recipientDid: string, messageIds: string[], mediationEndpoint: string): Promise<void> => {
+const sendPickupMessageReceived = async (to: string, recipientDid: string, messageIds: string[], mediationEndpoint: string): Promise<void> => {
   try {
+    const MEDIDOC = await new PeerDIDResolver().resolve(to)
+    const did_resolver = new ExampleDIDResolver([MEDIDOC as DIDDoc]);
+    const secrets_resolver = new ExampleSecretsResolver(CLIENT_SECRETS);
     const msg = await buildPickupMessageReceivedMessage(recipientDid, messageIds);
     const options: PackEncryptedOptions = { forward: false };
     const [encryptedMsg] = await msg.pack_encrypted(
       recipientDid,
-      ALICE_DID,
+      FROM,
       null,
-      didResolver,
-      secretsResolver,
+      did_resolver,
+      secrets_resolver,
       options
     );
     const response = await axios.post(mediationEndpoint, encryptedMsg, {
       headers: { 'Content-Type': 'application/didcomm-encrypted+json' }
     });
-    await handleUnpackResponse(response.data);
+    await handleUnpackResponse(to, response.data);
   } catch (error) {
     console.error("Error during pickup message received:", (error as Error).message);
   }
 };
 // Function to handle unpacking response
-const handleUnpackResponse = async (packedMsg: string): Promise<void> => {
+async function handleUnpackResponse(to: string, packedMsg: string): Promise<Message> {
   try {
+    const MEDIDOC = await new PeerDIDResolver().resolve(to)
+    const did_resolver = new ExampleDIDResolver([MEDIDOC as DIDDoc]);
+    const secrets_resolver = new ExampleSecretsResolver(CLIENT_SECRETS);
     const unpackOptions: UnpackOptions = {};
-    const [unpackedMsg] = await Message.unpack(
+    const unpackedMsg = await Message.unpack(
       packedMsg,
-      didResolver,
-      secretsResolver,
+      did_resolver,
+      secrets_resolver,
       unpackOptions
     );
-    await processUnpackedMessage(unpackedMsg);
+    return unpackedMsg[0]
   } catch (error) {
-    console.error("Error during unpacking response:", (error as Error).message);
-    throw error;
+    throw Error(error as string)
   }
 };
-// Function to process unpacked message
-const processUnpackedMessage = async (unpackedMsg: Message): Promise<void> => {
-  console.log('Processing unpacked message:', unpackedMsg);
-};
+export { sendPickupRequest, sendPickupDeliveryRequest, sendPickupMessageReceived, buildPickupDeliveryRequestMessage, buildPickupMessageReceivedMessage, handleUnpackResponse };

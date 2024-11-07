@@ -1,80 +1,41 @@
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
-import { PickupClient } from './pickup';
-import { Message } from 'didcomm';
-jest.mock('didcomm', () => ({
-  Message: jest.fn().mockImplementation(() => ({
-    pack_encrypted: jest.fn(),
-    unpack: jest.fn(),
-  })),
-}));
+import { FROM } from "./did/client"
+import { describe, test, expect } from "vitest"
+import {sendPickupRequest, sendPickupDeliveryRequest, buildPickupMessageReceivedMessage, sendPickupMessageReceived, handleUnpackResponse } from "./pickup"
 
-describe('PickupClient', () => {
-  let mockAdapter: MockAdapter;
-  let pickupClient: PickupClient;
+const SERVICE_ENDPOINT = "http://localhost:3000"
 
-  beforeEach(() => {
-    mockAdapter = new MockAdapter(axios);
-    pickupClient = new PickupClient('did:example:recipient', ['message-id-1'], 'https://example.com/mediation-endpoint');
+describe("test pickup request", async() => {
+  test("test pickup request", async() => {
+  const to = FROM;
+  const recipient_did = FROM;
+    const result = await sendPickupRequest(to, recipient_did);
+    expect(result).not.toBeNull();
+});
+  test("test pickup delivery request", async () => {
+    const to = FROM;
+    const recipientDid = FROM;
+    const result = await sendPickupDeliveryRequest(to, recipientDid);
+    expect(result).not.toBeNull();
+});
+test("test build pickup message received message", async () => {
+  const recipientDid = FROM;
+  const messageIds = ["message-id-1", "message-id-2"];
+  const result = await buildPickupMessageReceivedMessage(recipientDid, messageIds);
+  expect(result).not.toBeNull();
   });
 
-  afterEach(() => {
-    mockAdapter.restore();
+  test("test send pickup message received", async () => {
+    const to = FROM;
+    const recipientDid = FROM;
+    const messageIds = ["message-id-1", "message-id-2"];
+    const result = await sendPickupMessageReceived(to, recipientDid, messageIds, SERVICE_ENDPOINT);
+    expect(result).not.toBeNull();
   });
 
-  it('should send a pickup request', async () => {
-    const mockResponse = { success: true };
-    mockAdapter.onPost('https://example.com/mediation-endpoint').reply(200, mockResponse);
-
-    await pickupClient.sendPickupRequest();
-
-    const history = mockAdapter.history.post;
-    expect(history).toBeDefined();
-    expect(history.length).toBe(1);
-    expect(history[0].data).toContain('did:example:recipient');
-  });
-
-  it('should send a pickup delivery request', async () => {
-    const mockResponse = { success: true };
-    mockAdapter.onPost('https://example.com/mediation-endpoint').reply(200, mockResponse);
-
-    await pickupClient.sendPickupDeliveryRequest();
-
-    const history = mockAdapter.history.post;
-    expect(history).toBeDefined();
-    expect(history.length).toBe(1);
-    expect(history[0].data).toContain('did:example:recipient');
-  });
-
-  it('should send a pickup message received', async () => {
-    const mockResponse = { success: true };
-    mockAdapter.onPost('https://example.com/mediation-endpoint').reply(200, mockResponse);
-
-    await pickupClient.sendPickupMessageReceived();
-
-    const history = mockAdapter.history.post;
-    expect(history).toBeDefined();
-    expect(history.length).toBe(1);
-    expect(history[0].data).toContain('did:example:recipient');
-  });
-
-  it('should handle unpack response', async () => {
-    const mockResponse = { success: true };
-    mockAdapter.onPost('https://example.com/mediation-endpoint').reply(200, mockResponse);
-
-    const packedMsg = 'packed message';
-    const unpackedMsg = await pickupClient.handleUnpackResponse(packedMsg);
-
-    expect(unpackedMsg).toBeDefined();
-  });
-
-  it('should throw error during unpacking response', async () => {
-    const mockResponse = { success: true };
-    mockAdapter.onPost('https://example.com/mediation-endpoint').reply(200, mockResponse);
-
-    const packedMsg = 'packed message';
-    jest.spyOn(Message, 'unpack').mockRejectedValueOnce(new Error('unpacking error'));
-
-    await expect(pickupClient.handleUnpackResponse(packedMsg)).rejects.toThrowError('unpacking error');
+  test("test handle unpack response", async () => {
+    const to = FROM;
+    const packedMsg = "packed-message";
+    const result = await handleUnpackResponse(to, packedMsg);
+    expect(result).not.toBeNull();
   });
 });

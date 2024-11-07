@@ -29,16 +29,14 @@
     "jest-mock-axios": "^4.7.3",
     "jsonc-eslint-parser": "^2.4.0",
     "prettier": "^3.3.3",
-    "ts-jest": "^29.2.5",
-    "typescript": "5.5.4"
+    "typescript": "5.6.3",
+    "vite-plugin-wasm": "^3.3.0",
+    "vitest": "^2.1.4"
   },
   "workspaces": [
     "libs/*"
   ],
   "dependencies": {
-    "axios": "^1.7.7",
-    "did-resolver": "^4.1.0",
-    "didcomm": "^0.4.1",
-    "uuid": "^11.0.2"
+    "base64url": "^3.0.1"
   }
 }

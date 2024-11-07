@@ -15,10 +15,9 @@ export default class PeerDIDResolver implements DIDResolver {
       // Validate if the DID starts with the "did:peer:" prefix
       if (!did.startsWith('did:peer:')) {
         throw new Error('Unsupported DID method');
+      } else if (!did.startsWith('did:peer:2')) {
+        Error('Unsupported DID peer Version');
       }
-      //else if (!did.endsWith('did:peer:2')) {
-      //   throw new Error('Unsupported DID peer Version');
-      // }
 
       // Dissect the DID address
       const chain = did
@@ -39,26 +38,32 @@ export default class PeerDIDResolver implements DIDResolver {
       chain
         .filter(({ purpose }) => purpose !== 'Service')
         .forEach((item, index) => {
-          const id = `#key-${index + 1}`;
+          const id = `${did}-#key-${index + 1}`;
           const { purpose, multikey } = item;
 
+          let type: string;
           switch (purpose) {
             case 'Assertion':
+              type = 'Multikey';
               assertionMethod.push(id);
               break;
             case 'Verification':
+              type = 'Ed25519VerificationKey2020';
               authentication.push(id);
               break;
             case 'Encryption':
+              type = 'X25519KeyAgreementKey2020';
               keyAgreement.push(id);
               break;
+            default:
+              type = 'Multikey';
           }
 
           const method: VerificationMethod = {
             id,
-            type: 'Multikey',
+            type,
             controller: did,
-            publicKeyMultibase: `z${multikey}`,
+            publicKeyMultibase: `${multikey}`,
           };
 
           verificationMethods.push(method);
@@ -92,8 +97,8 @@ export default class PeerDIDResolver implements DIDResolver {
       };
 
       return diddoc;
-    } catch (error) {
-      console.error('Error resolving DID:', error);
+    } catch (error: string | unknown) {
+      Error(error as string);
       return null;
     }
   }
