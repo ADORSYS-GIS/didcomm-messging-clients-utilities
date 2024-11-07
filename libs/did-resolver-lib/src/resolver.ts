@@ -36,6 +36,8 @@ export default class PeerDIDResolver implements DIDResolver {
 
       if (!did.startsWith('did:peer:')) {
         throw new Error('Unsupported DID method');
+      } else if (!did.startsWith('did:peer:2')) {
+        Error('Unsupported DID peer Version');
       }
 
       const chain = did
@@ -52,26 +54,35 @@ export default class PeerDIDResolver implements DIDResolver {
       const keyAgreement: string[] = [];
       const verificationMethods: VerificationMethod[] = [];
 
-      chain.forEach((item, index) => {
-        const id = `#key-${index + 1}`;
-        const { purpose, multikey } = item;
+      chain
+        .filter(({ purpose }) => purpose !== 'Service')
+        .forEach((item, index) => {
+          const id = `${did}-#key-${index + 1}`;
+          const { purpose, multikey } = item;
 
-        let type = '';
-        if (purpose === 'Verification') {
-          if (!authentication.includes(id)) authentication.push(id);
-          type = 'Ed25519VerificationKey2020';
-        } else if (purpose === 'Encryption') {
-          if (!keyAgreement.includes(id)) keyAgreement.push(id);
-          type = 'X25519KeyAgreementKey2020';
-        }
+          let type: string;
+          switch (purpose) {
+            case 'Assertion':
+              type = 'Multikey';
+              assertionMethod.push(id);
+              break;
+            case 'Verification':
+              type = 'Ed25519VerificationKey2020';
+              authentication.push(id);
+              break;
+            case 'Encryption':
+              type = 'X25519KeyAgreementKey2020';
+              keyAgreement.push(id);
+              break;
+            default:
+              type = 'Multikey';
+          }
 
-        // Only add to verificationMethods if type is non-empty
-        if (type) {
           const method: VerificationMethod = {
             id,
-            type: type,
+            type,
             controller: did,
-            publicKeyMultibase: multikey,  // Use multikey directly without adding "z" prefix
+            publicKeyMultibase: `${multikey}`,
           };
           verificationMethods.push(method);
         }
@@ -104,8 +115,8 @@ export default class PeerDIDResolver implements DIDResolver {
 
       this.diddocs.push(diddoc);
       return diddoc;
-    } catch (error) {
-      console.error('Error resolving DID:', error);
+    } catch (error: string | unknown) {
+      Error(error as string);
       return null;
     }
   }

@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint '**/*.{js,ts,jsx,tsx}'",
     "dev": "vite",
-    "test": "jest",
+    "test": "vitest --run",
     "build": "tsc -b",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
