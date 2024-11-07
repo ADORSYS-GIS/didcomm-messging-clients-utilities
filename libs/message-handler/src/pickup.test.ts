@@ -1,6 +1,7 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { PickupClient } from './pickup';import { Message } from 'didcomm';
+import { PickupClient } from './pickup';
+import { Message } from 'didcomm';
 jest.mock('didcomm', () => ({
   Message: jest.fn().mockImplementation(() => ({
     pack_encrypted: jest.fn(),
