@@ -14,9 +14,9 @@ import { CONTENT_TYPE } from '../shared_data/constant';
 export async function forward_msg(to: string[], body: {}, message: string) {
 
   const mediator_didoc = await new PeerDIDResolver().resolve(to[0]);
-  const client_didoc = await new PeerDIDResolver().resolve(FROM);
+
   console.log("Mediator DID doc: ", mediator_didoc);
-  const did_resolver: DIDResolver = new ExampleDIDResolver([mediator_didoc as DIDDoc, client_didoc as DIDDoc]);
+  const did_resolver: DIDResolver = new ExampleDIDResolver([mediator_didoc as DIDDoc]);
   const secret_resolver: SecretsResolver = new ExampleSecretsResolver(CLIENT_SECRETS);
 
   const val: IMessage = {
@@ -39,7 +39,7 @@ export async function forward_msg(to: string[], body: {}, message: string) {
   };
 
   const msg = new Message(val);
-  let next = to[0];
+
   try {
     const [packed_msg, _packedMetadata] = await msg.pack_encrypted(
       to[0],
@@ -51,8 +51,7 @@ export async function forward_msg(to: string[], body: {}, message: string) {
         forward: true,
       },
     );
-    console.log('Packed message:', packed_msg);
-
+    
     let response = await axios.post(
       MEDIATOR_ENDPOINT,
       packed_msg,
@@ -63,6 +62,8 @@ export async function forward_msg(to: string[], body: {}, message: string) {
       },
     );
     console.log('Message forwared successfully:', response.status);
+
+    return 'Messages sent to recipient';
   } catch (error: any) {
     console.error('Error forwarding message:', error);
     throw new Error(error);

@@ -61,6 +61,7 @@ export default class PeerDIDResolver implements DIDResolver {
           const { purpose, multikey } = item;
 
           let type: string;
+          const assertionMethod: string[] = [];
           switch (purpose) {
             case 'Assertion':
               type = 'Multikey';
@@ -86,7 +87,7 @@ export default class PeerDIDResolver implements DIDResolver {
           };
           verificationMethods.push(method);
         }
-      });
+      );
 
       const services: Service[] = [];
       let serviceNextId = 0;

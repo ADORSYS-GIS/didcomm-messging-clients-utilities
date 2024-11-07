@@ -26,10 +26,10 @@
     "@typescript-eslint/eslint-plugin": "^8.11.0",
     "@typescript-eslint/parser": "^8.11.0",
     "eslint": "^9.13.0",
+    "jest": "^29.7.0",
     "jsonc-eslint-parser": "^2.4.0",
     "prettier": "^3.3.3",
     "typescript": "5.6.3",
-    "jest": "^29.7.0",
     "vite-plugin-wasm": "^3.3.0",
     "vitest": "^2.1.4"
   },
@@ -38,6 +38,7 @@
     "libs/message-handler"
   ],
   "dependencies": {
-    "base64url": "^3.0.1"
+    "base64url": "^3.0.1",
+    "didcomm": "^0.4.1"
   }
 }
