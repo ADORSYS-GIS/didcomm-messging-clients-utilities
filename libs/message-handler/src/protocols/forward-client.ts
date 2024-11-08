@@ -11,19 +11,13 @@ import { CONTENT_TYPE } from '../shared_data/constant';
 
 
 
-export async function forward_msg(to: string[], body: {}, message: string) {
+export function buildMessage(to: string[], message: any): Message {
 
-  const mediator_didoc = await new PeerDIDResolver().resolve(to[0]);
-
-  console.log("Mediator DID doc: ", mediator_didoc);
-  const did_resolver: DIDResolver = new ExampleDIDResolver([mediator_didoc as DIDDoc]);
-  const secret_resolver: SecretsResolver = new ExampleSecretsResolver(CLIENT_SECRETS);
-
-  const val: IMessage = {
+  const imsg: IMessage = {
     id: uuidv4(),
     typ: "application/didcomm-plain+json",
     type: ROUTING,
-    body: body,
+    body: {},
     from: FROM,
     to: to,
     attachments: [
@@ -37,11 +31,26 @@ export async function forward_msg(to: string[], body: {}, message: string) {
       },
     ],
   };
+  let msg = new Message(imsg)
+  return msg
+}
+export async function forward_msg(to: string[], message: string) {
+  const msg = buildMessage(to, message)
 
-  const msg = new Message(val);
+  const packed_msg = await pack_encrypt(msg, to);
+  await sendRequest(packed_msg as string)
+}
+
+export async function pack_encrypt(msg: Message, to: string[]): Promise<string | null> {
+
+  const mediator_didoc = await new PeerDIDResolver().resolve(to[0]);
+
+  const did_resolver: DIDResolver = new ExampleDIDResolver([mediator_didoc as DIDDoc]);
+  const secret_resolver: SecretsResolver = new ExampleSecretsResolver(CLIENT_SECRETS);
+
 
   try {
-    const [packed_msg, _packedMetadata] = await msg.pack_encrypted(
+    const result = await msg.pack_encrypted(
       to[0],
       FROM,
       null,
@@ -51,8 +60,16 @@ export async function forward_msg(to: string[], body: {}, message: string) {
         forward: true,
       },
     );
-    
-    let response = await axios.post(
+    return result[0]
+
+  } catch (error) {
+    throw new Error(error as string)
+  };
+
+}
+export async function sendRequest(packed_msg: string) {
+  try {
+    await axios.post(
       MEDIATOR_ENDPOINT,
       packed_msg,
       {
@@ -61,12 +78,9 @@ export async function forward_msg(to: string[], body: {}, message: string) {
         },
       },
     );
-    console.log('Message forwared successfully:', response.status);
 
-    return 'Messages sent to recipient';
-  } catch (error: any) {
-    console.error('Error forwarding message:', error);
-    throw new Error(error);
+  } catch (error) {
+    throw new Error(error as string)
   }
-
 }
+
