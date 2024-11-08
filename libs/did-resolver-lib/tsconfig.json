@@ -9,6 +9,11 @@
     "moduleResolution": "Node",
     "skipLibCheck": true
   },
-  "include": ["src/**/*", "jest-puppeteer.config.js", "jest.config.puppeteer.js", "../message-handler/src/mediation-coordination.ts"],
+  "include": [
+    "src/**/*",
+    "jest-puppeteer.config.js",
+    "jest.config.puppeteer.js",
+    "../message-handler/src/mediation-coordination.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

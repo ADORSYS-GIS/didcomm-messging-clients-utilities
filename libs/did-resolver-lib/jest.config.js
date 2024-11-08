@@ -1,7 +1,7 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
-  testEnvironment: "node",
+  testEnvironment: 'node',
   transform: {
-    "^.+\\.ts?$": "ts-jest",
+    '^.+\\.ts?$': 'ts-jest',
   },
 };

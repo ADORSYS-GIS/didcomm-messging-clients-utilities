@@ -23,15 +23,3 @@ export const CLIENT_SECRETS: Secret[] = [
     },
   },
 ];
-
-// export const SECRETS: Secret =
-// {
-//   id: "did:key:z6MkrQT3VKYGkbPaYuJeBv31gNgpmVtRWP5yTocLDBgPpayM#key-1",
-//   type: "JsonWebKey2020",
-//   privateKeyJwk: {
-//     crv: "Ed25519",
-//     d: "kUKFMD3RCZpk556fG0hx9GUrmdvb8t7k3TktPXCi4CY",
-//     kty: "OKP",
-//     x: "sZPvulKOXCES3D8Eya3LVnlgOpEaBohCqZ7emD8VXAA",
-//   },
-// }
