@@ -24,6 +24,5 @@ describe('didcomm', () => {
     expect(packmsg).not.toBeNull();
 
     expect(buildmsg).toEqual(msg);
-
   });
 });
