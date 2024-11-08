@@ -1,5 +1,5 @@
 const ALICE_DID = 'did:example:alice123';
-const SERVICE_ENDPOINT = '';
+const SERVICE_ENDPOINT = 'https://example.com/api/pickup';
 const PICKUP_REQUEST_3_0 = 'https://didcomm.org/pickup-request/3.0';
 const PICKUP_DELIVERY_3_0 = 'https://didcomm.org/pickup-delivery/3.0';
 const PICKUP_RECEIVE_3_0 = 'https://didcomm.org/pickup-receive/3.0';
