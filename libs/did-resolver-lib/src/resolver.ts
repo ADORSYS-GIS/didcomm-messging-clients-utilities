@@ -23,14 +23,14 @@ export default class PeerDIDResolver implements DIDResolver {
         keyAgreement: [],
         authentication: [],
         verificationMethod: [],
-        service: []
-      }
+        service: [],
+      },
     ]);
   }
 
   async resolve(did: string): Promise<DIDDoc | null> {
     try {
-      const existingDIDDoc = this.diddocs.find(doc => doc.id === did);
+      const existingDIDDoc = this.diddocs.find((doc) => doc.id === did);
       if (existingDIDDoc) return existingDIDDoc;
 
       if (!did.startsWith('did:peer:')) {
@@ -85,8 +85,7 @@ export default class PeerDIDResolver implements DIDResolver {
             publicKeyMultibase: `${multikey}`,
           };
           verificationMethods.push(method);
-        }
-      );
+        });
 
       const services: Service[] = [];
       let serviceNextId = 0;
@@ -94,11 +93,14 @@ export default class PeerDIDResolver implements DIDResolver {
       chain
         .filter(({ purpose }) => purpose === 'Service')
         .forEach(({ multikey }) => {
-          const decodedService = Buffer.from(multikey, 'base64').toString('utf-8');
+          const decodedService = Buffer.from(multikey, 'base64').toString(
+            'utf-8',
+          );
           const service = reverseAbbreviateService(decodedService);
 
           if (!service.id) {
-            service.id = serviceNextId === 0 ? '#service' : `#service-${serviceNextId}`;
+            service.id =
+              serviceNextId === 0 ? '#service' : `#service-${serviceNextId}`;
             serviceNextId++;
           }
 
