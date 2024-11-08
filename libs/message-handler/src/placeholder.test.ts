@@ -13,6 +13,8 @@ describe('didcomm', () => {
       expires_time: 1516385931,
       body: { messagespecificattribute: 'and its value' },
     });
-    console.log(msg.as_value());
+    const val = new Message(msg.as_value());
+    return val;
+
   });
 });
