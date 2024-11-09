@@ -1,98 +1,19 @@
-import { FROM } from './did/client';
-import { describe, test, expect, vi } from 'vitest';
-import {
-  sendPickupRequest,
-  sendPickupDeliveryRequest,
-  buildPickupMessageReceivedMessage,
-  sendPickupMessageReceived,
-  handleUnpackResponse,
-} from './pickup';
+import { PICKUP_REQUEST_3_0 } from "./constants/message-type"
+import { FROM } from "./did/client"
+import { describe, test, expect } from "vitest"
+import { buildMessage, handleResponse, pack_encrypt } from "./pickup"
 
+const To = "did:peer:2.Vz6MkmPB3CCH5DBrtSi1MKXEcPXRFXSm7MVqEgsntoYwmtAWX.Ez6MkwH2RDGfBo89VA8EPP5pTRnfcV2Z8XyHCjyWiQjMQE3Si.SeyJ0IjoiZG0iLCJzIjp7InVyaSI6Imh0dHA6Ly9leGFtcGxlLmNvbS9kaWRjb21tIiwiYSI6WyJkaWRjb21tL3YyIl0sInIiOlsiZGlkOnBlZXI6Mi5WejZNa21QQjNDQ0g1REJydFNpMU1LWEVjUFhSRlhTbTdNVnFFZ3NudG9Zd210QVdYLkV6Nk1rd0gyUkRHZkJvODlWQThFUFA1cFRSbmZjVjJaOFh5SENqeVdpUWpNUUUzU2kja2V5LTEiXX19"
 
-const SERVICE_ENDPOINT = 'http://localhost:3000';
+describe('didcomm', () => {
+  test('test message packing and unpacking for pickup request', async () => {
+    const msg = buildMessage(FROM, To, PICKUP_REQUEST_3_0);
+    console.log(msg.as_value())
+    const packmsg = await pack_encrypt(msg, FROM)
+    console.log(packmsg)
+    const unpacksg = await handleResponse(FROM, packmsg as string)
+    console.log(unpacksg)
+    expect(packmsg).not.toBeNull()
 
-
-describe('test pickup request', () => {
-  test('test pickup request', async () => {
-    const to = FROM;
-    const recipient_did = FROM;
-    try {
-      const result = await sendPickupRequest(to, recipient_did);
-      expect(result).not.toBeNull();
-    } catch (error) {
-      console.error('Error during pickup request:', error);
-      expect(error).toBeInstanceOf(Error);
-    }
-  });
-
-
-  test('test pickup delivery request', async () => {
-    const to = FROM;
-    const recipientDid = FROM;
-    try {
-      const result = await sendPickupDeliveryRequest(to, recipientDid);
-      expect(result).not.toBeNull();
-    } catch (error) {
-      console.error(error);
-      expect(error).toBeInstanceOf(Error);
-    }
-  });
-
-
-  test('test build pickup message received message', async () => {
-    const recipientDid = FROM;
-    const messageIds = ['message-id-1', 'message-id-2'];
-    try {
-      const result = await buildPickupMessageReceivedMessage(
-        recipientDid,
-        messageIds,
-      );
-      expect(result).not.toBeNull();
-    } catch (error) {
-      console.error('Error building pickup message received:', error);
-      expect(error).toBeInstanceOf(Error);
-    }
-  });
-
-
-  test('test send pickup message received', async () => {
-    const to = FROM;
-    const recipientDid = FROM;
-    const messageIds = ['message-id-1', 'message-id-2'];
-
-
-    // Mock the axios call
-    vi.mock('axios', () => ({
-      __esModule: true,
-      default: {
-        post: vi.fn(() => Promise.resolve({ data: {} })),
-      },
-    }));
-  
-    try {
-      const result = await sendPickupMessageReceived(
-        to,
-        recipientDid,
-        messageIds,
-        SERVICE_ENDPOINT,
-      );
-      expect(result).not.toBeNull();
-    } catch (error) {
-      console.error('Error during send pickup message received:', error);
-      expect(error).toBeInstanceOf(Error);
-    }
   })
-
-
-  test('test handle unpack response', async () => {
-    const to = FROM;
-    const packedMsg = 'packed-message';
-    try {
-      const result = await handleUnpackResponse(to, packedMsg);
-      expect(result).not.toBeNull();
-    } catch (error) {
-      console.error('Error during unpack response:', error);
-      expect(error).toBeInstanceOf(Error);
-    }
-  });
-});
+})
