@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { buildMsg, pack_encrypted } from '../mediation-coordination';
+import { buildMsg, pack_encrypted, unpack } from '../mediation-coordination';
 import { MEDIATE_REQUEST } from '../protocols/message_types';
 
 const To: string[] = [
@@ -18,11 +18,14 @@ const msg = {
 };
 
 describe('didcomm', () => {
-  test('build and pack message ', async () => {
+  test('build, pack and unpack message ', async () => {
     const buildmsg = await buildMsg(To, MEDIATE_REQUEST, {});
     const packmsg = await pack_encrypted(To, buildmsg);
+    const unpackmsg = await unpack(packmsg, To);
+
     expect(packmsg).not.toBeNull();
 
     expect(buildmsg).toEqual(msg);
+    expect(unpackmsg?.as_value()).toEqual(msg);
   });
 });

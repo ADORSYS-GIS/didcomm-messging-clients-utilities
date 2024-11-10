@@ -3,7 +3,7 @@ import { FROM } from '../shared_data/constants';
 
 export const CLIENT_SECRETS: Secret[] = [
   {
-    id: `${FROM}-#key-1`,
+    id: `${FROM}#key-1`,
     type: 'JsonWebKey2020',
     privateKeyJwk: {
       crv: 'Ed25519',
@@ -13,7 +13,7 @@ export const CLIENT_SECRETS: Secret[] = [
     },
   },
   {
-    id: `${FROM}-#key-2`,
+    id: `${FROM}#key-2`,
     type: 'JsonWebKey2020',
     privateKeyJwk: {
       crv: 'X25519',

@@ -13,14 +13,14 @@ import {
 import { CONTENT_TYPE, FROM, SERVICE_ENDPOINT } from './shared_data/constants';
 
 /**
- * @function Mediation_Coordinaton
+ * @function Mediation_Coordination
  * @description Coordinates the mediation process by sending a mediation request and updating the keylist based on the response.
  * @param {string[]} to - The recipient DID(s) of the message
  * @param {string} recipient_did - The recipient DID of the mediation request
  * @param {string} action - The action to be taken for the keylist update
  * @returns {Promise<string | undefined>} - Returns the routing DID if successful, or undefined if mediation is denied
  */
-export default async function mediationCoordinaton(
+export default async function mediationCoordination(
   to: string[],
   recipient_did: string,
   action: string,
