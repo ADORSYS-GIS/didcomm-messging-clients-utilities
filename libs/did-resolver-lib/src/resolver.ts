@@ -56,7 +56,7 @@ export default class PeerDIDResolver implements DIDResolver {
       chain
         .filter(({ purpose }) => purpose !== 'Service')
         .forEach((item, index) => {
-          const id = `${did}-#key-${index + 1}`;
+          const id = `${did}#key-${index + 1}`;
           const { purpose, multikey } = item;
 
           let type: string;
