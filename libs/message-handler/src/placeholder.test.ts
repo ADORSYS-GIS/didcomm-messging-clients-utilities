@@ -15,6 +15,5 @@ describe('didcomm', () => {
     });
     const val = new Message(msg.as_value());
     return val;
-
   });
 });
