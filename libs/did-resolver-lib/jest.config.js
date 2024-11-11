@@ -3,8 +3,6 @@ export default {
   testEnvironment: 'node',
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   transform: {
-    '^.+.ts?$': ['ts-jest', 'babel-jest', {}],
+    '^.+.ts?$': ['ts-jest', {}],
   },
-  transformIgnorePatterns: ['/node_modules/(?!(didcomm)/)'],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 };
