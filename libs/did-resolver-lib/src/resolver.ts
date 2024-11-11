@@ -1,5 +1,5 @@
-import { Buffer } from 'buffer';
 import { DIDDoc, DIDResolver, Service, VerificationMethod } from 'didcomm';
+import base64url from 'base64url';
 
 type Purpose =
   | 'Assertion'
@@ -10,35 +10,16 @@ type Purpose =
   | 'Service';
 
 export default class PeerDIDResolver implements DIDResolver {
-  private diddocs: DIDDoc[];
-
-  constructor(diddocs: DIDDoc[] = []) {
-    this.diddocs = diddocs;
-  }
-
-  static default(): PeerDIDResolver {
-    return new PeerDIDResolver([
-      {
-        id: '',
-        keyAgreement: [],
-        authentication: [],
-        verificationMethod: [],
-        service: [],
-      },
-    ]);
-  }
-
   async resolve(did: string): Promise<DIDDoc | null> {
     try {
-      const existingDIDDoc = this.diddocs.find((doc) => doc.id === did);
-      if (existingDIDDoc) return existingDIDDoc;
-
+      // Validate if the DID starts with the "did:peer:" prefix
       if (!did.startsWith('did:peer:')) {
         throw new Error('Unsupported DID method');
       } else if (!did.startsWith('did:peer:2')) {
         Error('Unsupported DID peer Version');
       }
 
+      // Dissect the DID address
       const chain = did
         .replace(/^did:peer:2\./, '')
         .split('.')
@@ -51,6 +32,7 @@ export default class PeerDIDResolver implements DIDResolver {
 
       const authentication: string[] = [];
       const keyAgreement: string[] = [];
+      const assertionMethod: string[] = [];
       const verificationMethods: VerificationMethod[] = [];
 
       chain
@@ -60,7 +42,6 @@ export default class PeerDIDResolver implements DIDResolver {
           const { purpose, multikey } = item;
 
           let type: string;
-          const assertionMethod: string[] = [];
           switch (purpose) {
             case 'Assertion':
               type = 'Multikey';
@@ -84,18 +65,18 @@ export default class PeerDIDResolver implements DIDResolver {
             controller: did,
             publicKeyMultibase: `${multikey}`,
           };
+
           verificationMethods.push(method);
         });
 
+      // Resolve services
       const services: Service[] = [];
       let serviceNextId = 0;
 
       chain
         .filter(({ purpose }) => purpose === 'Service')
         .forEach(({ multikey }) => {
-          const decodedService = Buffer.from(multikey, 'base64').toString(
-            'utf-8',
-          );
+          const decodedService = base64url.decode(multikey);
           const service = reverseAbbreviateService(decodedService);
 
           if (!service.id) {
@@ -115,7 +96,6 @@ export default class PeerDIDResolver implements DIDResolver {
         service: services,
       };
 
-      this.diddocs.push(diddoc);
       return diddoc;
     } catch (error: string | unknown) {
       Error(error as string);

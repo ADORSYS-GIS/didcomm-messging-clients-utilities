@@ -18,7 +18,7 @@ import { CLIENT_SECRETS } from '../secrets/client';
 import { MEDIATOR_ENDPOINT } from '../shared_data/endpoints';
 import { CONTENT_TYPE } from '../shared_data/constant';
 
-export function buildMessage(to: string[], message: unknown): Message {
+export function buildMessage(to: string[], message: string): Message {
   const imsg: IMessage = {
     id: uuidv4(),
     typ: 'application/didcomm-plain+json',
