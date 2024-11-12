@@ -144,7 +144,6 @@ export async function keylistUpdate(
   action: Action,
   mediatorDid: string[],
 ) {
-
   const body = {
     updates: [
       {
