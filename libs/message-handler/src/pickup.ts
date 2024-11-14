@@ -4,8 +4,8 @@ import { DIDDoc, Message, UnpackOptions } from 'didcomm';
 import {
   ExampleDIDResolver,
   ExampleSecretsResolver,
-} from '../../did-resolver-lib/src/ExampleDIDResolver';
-import PeerDIDResolver from '../../did-resolver-lib/src/resolver';
+  PeerDIDResolver,
+} from 'did-resolver-lib';
 
 import {
   PICKUP_DELIVERY_3_0,
