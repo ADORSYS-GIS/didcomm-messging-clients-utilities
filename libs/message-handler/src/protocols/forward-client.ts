@@ -7,11 +7,11 @@ import {
 } from 'didcomm';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
-import PeerDIDResolver from '../../../did-resolver-lib/src/resolver';
 import {
+  PeerDIDResolver,
   ExampleDIDResolver,
   ExampleSecretsResolver,
-} from '../../../did-resolver-lib/src/ExampleDIDResolver';
+} from 'did-resolver-lib';
 import { FROM } from '../did_doc/client';
 import { ROUTING } from '../shared_data/message_types';
 import { CLIENT_SECRETS } from '../secrets/client';
