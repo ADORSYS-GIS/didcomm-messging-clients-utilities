@@ -78,11 +78,17 @@ export async function pack_encrypt(
 }
 export async function sendRequest(packed_msg: string) {
   try {
-    await axios.post(MEDIATOR_ENDPOINT, packed_msg, {
+    const response = await axios.post(MEDIATOR_ENDPOINT, packed_msg, {
       headers: {
         'Content-type': CONTENT_TYPE,
       },
     });
+
+    if (response.status >= 200 && response.status < 300) {
+      return response.data;
+    } else {
+      throw new Error(`Unexpected response status: ${response.status}`);
+    }
   } catch (error) {
     throw new Error(error as string);
   }
