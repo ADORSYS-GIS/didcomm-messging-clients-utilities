@@ -11,4 +11,14 @@ describe('Forward Client Tests', () => {
     const packmsg = pack_encrypt(msg, to);
     expect(packmsg).not.toBeNull();
   });
+  test('should handle wrong DID and throw an error', async () => {
+    const to = [
+      'did:peer:3.InvalidDIDExample.SeyJpZCI6IiNkaWRjb21tIiwicyI6eyJhIjpbImRpZGNvbW0vdjIiXSwiciI6W10sInVyaSI6Imh0dHA6Ly9hbGljZS1tZWRpYXRvci5jb20ifSwidCI6ImRtIn0',
+    ];
+    const message = 'This should fail due to an invalid DID';
+
+    const msg = buildMessage(to, message);
+
+    await expect(pack_encrypt(msg, to)).rejects.toThrowError();
+  });
 });
