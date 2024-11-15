@@ -1,11 +1,8 @@
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { DIDDoc, Message, UnpackOptions } from 'didcomm';
-import {
-  ExampleDIDResolver,
-  ExampleSecretsResolver,
-  PeerDIDResolver,
-} from 'did-resolver-lib';
+import { ExampleDIDResolver, ExampleSecretsResolver } from 'did-resolver-lib';
+import PeerDIDResolver from '../../did-resolver-lib/src/resolver';
 
 import {
   PICKUP_DELIVERY_3_0,

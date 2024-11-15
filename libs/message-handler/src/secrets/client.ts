@@ -1,5 +1,5 @@
 import { Secret } from 'didcomm';
-import { FROM } from '../did/client';
+import { FROM } from '../shared_data/constants';
 
 export const CLIENT_SECRETS: Secret[] = [
   {

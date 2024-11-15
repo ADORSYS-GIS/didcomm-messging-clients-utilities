@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "description": "",
-  "type": "module",
+  "type": "commonjs",
   "dependencies": {
     "base64url": "^3.0.1",
     "didcomm": "^0.4.1"
