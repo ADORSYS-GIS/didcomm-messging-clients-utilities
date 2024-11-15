@@ -12,11 +12,11 @@ import {
   ExampleDIDResolver,
   ExampleSecretsResolver,
 } from 'did-resolver-lib';
-import { FROM } from '../did_doc/client';
+//import { FROM } from '../did_doc/client';
 import { ROUTING } from '../shared_data/message_types';
 import { CLIENT_SECRETS } from '../secrets/client';
 import { MEDIATOR_ENDPOINT } from '../shared_data/endpoints';
-import { CONTENT_TYPE } from '../shared_data/constant';
+import { CONTENT_TYPE, FROM } from '../shared_data/constants';
 
 export function buildMessage(to: string[], message: string): Message {
   const imsg: IMessage = {
