@@ -1,8 +1,8 @@
 // Import necessary constants and functions from other modules
-import { PICKUP_REQUEST_3_0 } from './constants/message-type';
-import { FROM } from './did/client';
+import { PICKUP_REQUEST_3_0 } from '../protocols/message_types';
+import { FROM } from '../shared_data/constants';
 import { describe, test, expect } from 'vitest';
-import { buildMessage, handleResponse, pack_encrypt } from './pickup';
+import { buildMessage, handleResponse, pack_encrypt } from '../pickup';
 
 const To =
   'did:peer:2.Vz6MkmPB3CCH5DBrtSi1MKXEcPXRFXSm7MVqEgsntoYwmtAWX.Ez6MkwH2RDGfBo89VA8EPP5pTRnfcV2Z8XyHCjyWiQjMQE3Si.SeyJ0IjoiZG0iLCJzIjp7InVyaSI6Imh0dHA6Ly9leGFtcGxlLmNvbS9kaWRjb21tIiwiYSI6WyJkaWRjb21tL3YyIl0sInIiOlsiZGlkOnBlZXI6Mi5WejZNa21QQjNDQ0g1REJydFNpMU1LWEVjUFhSRlhTbTdNVnFFZ3NudG9Zd210QVdYLkV6Nk1rd0gyUkRHZkJvODlWQThFUFA1cFRSbmZjVjJaOFh5SENqeVdpUWpNUUUzU2kja2V5LTEiXX19';

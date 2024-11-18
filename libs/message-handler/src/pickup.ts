@@ -9,9 +9,9 @@ import {
   PICKUP_RECEIVE_3_0,
   PICKUP_REQUEST_3_0,
   SERVICE_ENDPOINT,
-} from './constants/message-type';
+} from './protocols/message_types';
 import { CLIENT_SECRETS } from './secrets/client';
-import { FROM } from './did/client';
+import { FROM } from './shared_data/constants';
 
 export async function pickupRequest(to: string, recipient_did: string) {
   const type = PICKUP_REQUEST_3_0;
