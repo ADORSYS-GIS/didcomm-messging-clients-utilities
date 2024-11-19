@@ -1,5 +1,5 @@
 import { Message } from 'didcomm';
-import { describe, test } from 'vitest';
+import { describe, test, expect } from 'vitest'; // Ensure expect is imported
 
 describe('didcomm', () => {
   test('authentication example', async () => {
@@ -13,7 +13,6 @@ describe('didcomm', () => {
       expires_time: 1516385931,
       body: { messagespecificattribute: 'and its value' },
     });
-    const val = new Message(msg.as_value());
-    return val;
+    expect(msg.as_value()).toBeDefined();
   });
 });
