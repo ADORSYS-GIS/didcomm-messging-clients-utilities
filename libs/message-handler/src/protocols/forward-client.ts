@@ -85,9 +85,15 @@ export async function sendRequest(packed_msg: string) {
     });
 
     if (response.status >= 200 && response.status < 300) {
-      return response.data;
+      if (response.data) {
+        return response.data;
+      } else {
+        return { message: 'Request was successful, no further data returned.' };
+      }
     } else {
-      throw new Error(`Unexpected response status: ${response.status}`);
+      throw new Error(
+        `Unexpected response status: ${response.status}, Response data: ${JSON.stringify(response.data)}`,
+      );
     }
   } catch (error) {
     throw new Error(error as string);
