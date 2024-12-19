@@ -1,4 +1,3 @@
-import React from 'react';
 import { useFormik } from 'formik'
 import mediationCoordination from '../../../message-handler/src/mediation-coordination';
 export const SignupForm = () => {

@@ -1,6 +1,6 @@
 import { DIDDoc, IMessage, Message } from 'didcomm';
 import { DIDResolver, SecretsResolver } from 'didcomm';
-import { uuid as uuidv4 } from 'uuidv4';
+import { v4 as uuidv4 } from 'uuid';
 import {
   ExampleDIDResolver,
   ExampleSecretsResolver,
@@ -74,6 +74,7 @@ export async function packEncrypted(message: IMessage) {
   const MEDIATOR_DIDDOC: DIDDoc | null = await new PeerDIDResolver().resolve(
     to[0],
   );
+  console.log(MEDIATOR_DIDDOC);
 
   const did_resolver: DIDResolver = new ExampleDIDResolver([
     CLIENT_DIDDOC as DIDDoc,
@@ -83,6 +84,7 @@ export async function packEncrypted(message: IMessage) {
     CLIENT_SECRETS,
   );
   try {
+  
     const packed_msg = await msg.pack_encrypted(
       to[0],
       FROM,

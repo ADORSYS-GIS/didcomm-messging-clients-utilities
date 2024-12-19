@@ -1,5 +1,9 @@
 import { DIDDoc, DIDResolver, Service, VerificationMethod } from 'didcomm';
 import base64url from 'base64url';
+import { Buffer } from 'buffer';
+if (typeof window !== 'undefined') {
+  window.Buffer = Buffer;
+}
 
 type Purpose =
   | 'Assertion'
