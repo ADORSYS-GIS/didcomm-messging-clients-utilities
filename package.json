@@ -34,7 +34,8 @@
   },
   "workspaces": [
     "libs/did-resolver-lib",
-    "libs/message-handler"
+    "libs/message-handler",
+    "libs/components"
   ],
   "dependencies": {
     "base64url": "^3.0.1",

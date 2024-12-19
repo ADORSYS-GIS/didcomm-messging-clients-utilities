@@ -21,4 +21,5 @@ describe('Forward Client Tests', () => {
 
     await expect(pack_encrypt(msg, to)).rejects.toThrowError();
   });
+
 });
