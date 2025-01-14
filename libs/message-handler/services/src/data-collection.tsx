@@ -1,9 +1,9 @@
 import React from 'react';
-import {  Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import './data-collection.css';
 import MediatorCoordination from './components/MediatorCoordination';
 import PickupComponent from './components/PickupRequest';
-import ForwardComponent from './components/ForwardRequest'; 
+import ForwardComponent from './components/ForwardRequest';
 
 const MediatorApp: React.FC = () => {
   const navigate = useNavigate();
@@ -12,7 +12,9 @@ const MediatorApp: React.FC = () => {
     <div className="mediator-app">
       <header className="app-header">DIDComm Mediator</header>
       <nav className="sidebar">
-        <button onClick={() => navigate('/coordination')}>Mediator Coordination</button>
+        <button onClick={() => navigate('/coordination')}>
+          Mediator Coordination
+        </button>
         <button onClick={() => navigate('/pickup')}>Pickup mesage</button>
         <button onClick={() => navigate('/forward')}>Forward message</button>
       </nav>
