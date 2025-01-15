@@ -38,6 +38,7 @@
   ],
   "dependencies": {
     "base64url": "^3.0.1",
+    "react-router-dom": "^7.1.1",
     "uuid": "^11.0.2",
     "uuidv4": "^6.2.13"
   }
