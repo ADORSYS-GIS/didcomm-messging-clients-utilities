@@ -1,11 +1,11 @@
 import { DIDDoc, IMessage, Message } from 'didcomm';
 import { DIDResolver, SecretsResolver } from 'didcomm';
-import { uuid as uuidv4 } from 'uuidv4';
 import {
   ExampleDIDResolver,
   ExampleSecretsResolver,
   PeerDIDResolver,
 } from 'did-resolver-lib';
+import { v4 as uuidv4 } from 'uuid';
 
 enum Action {
   add = 'add',
