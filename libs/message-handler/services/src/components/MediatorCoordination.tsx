@@ -10,7 +10,6 @@ const MediatorCoordination: React.FC = () => {
     <div className="mediator-app">
       <header className="app-header">Mediator Coordination</header>
       <nav className="sidebar">
-        {/* Ensure these are absolute paths */}
         <button onClick={() => navigate('/query')}>Query key</button>
         <button onClick={() => navigate('/mediateRequest')}>Mediate request</button>
       </nav>
