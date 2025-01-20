@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
-import { TextField, Button, CircularProgress, Box, Typography } from '@mui/material';
+import {
+  TextField,
+  Button,
+  CircularProgress,
+  Box,
+  Typography,
+} from '@mui/material';
 import { keylistQuery } from './../../../../src/mediation-coordination';
-import { Message } from 'didcomm'; 
-
+import { Message } from 'didcomm';
 
 const KeylistQueryUI = () => {
   const [recipientDid, setRecipientDid] = useState('');
   const [mediatorDid, setMediatorDid] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<Message | null>(null); 
+  const [result, setResult] = useState<Message | null>(null);
   const [error, setError] = useState<string | null>(null);
   const handleKeylistQuery = async () => {
     setIsLoading(true);

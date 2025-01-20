@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './request.css'; 
+import './request.css';
 
 const MediateRequestUI: React.FC = () => {
   const [mediatorDid, setMediatorDid] = useState('');
@@ -18,11 +18,11 @@ const MediateRequestUI: React.FC = () => {
       const res = await fetch('http://localhost:3000/', {
         method: 'POST',
         headers: {
-      'Content-Type': 'application/didcomm-encrypted+json',
+          'Content-Type': 'application/didcomm-encrypted+json',
         },
         body: JSON.stringify(body),
       });
-      
+
       if (!res.ok) {
         // throw new Error(`Request failed: ${res.statusText}`);
       }

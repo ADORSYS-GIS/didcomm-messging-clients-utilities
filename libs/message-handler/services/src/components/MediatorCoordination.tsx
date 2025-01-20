@@ -11,7 +11,9 @@ const MediatorCoordination: React.FC = () => {
       <header className="app-header">Mediator Coordination</header>
       <nav className="sidebar">
         <button onClick={() => navigate('/query')}>Query key</button>
-        <button onClick={() => navigate('/mediateRequest')}>Mediate request</button>
+        <button onClick={() => navigate('/mediateRequest')}>
+          Mediate request
+        </button>
       </nav>
       <main className="content">
         <Routes>
