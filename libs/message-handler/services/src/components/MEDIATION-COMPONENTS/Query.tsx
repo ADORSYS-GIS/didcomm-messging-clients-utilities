@@ -6,23 +6,28 @@ import {
   Box,
   Typography,
 } from '@mui/material';
-import { keylistQuery } from './../../../../src/mediation-coordination';
-import { Message } from 'didcomm';
+import { keylistQuery } from '../../../../src/mediation-coordination';
+import { IMessage, Message } from 'didcomm';
 
 const KeylistQueryUI = () => {
   const [recipientDid, setRecipientDid] = useState('');
   const [mediatorDid, setMediatorDid] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<Message | null>(null);
+  const [result, setResult] = useState<IMessage | null>(null);
   const [error, setError] = useState<string | null>(null);
+
   const handleKeylistQuery = async () => {
     setIsLoading(true);
+    setResult(null);
     setError(null);
+
     try {
-      const response = await keylistQuery(mediatorDid, [recipientDid]);
-      setResult(response);
-    } catch (err: any) {
-      setError('Error executing keylist query: ' + err.message);
+      const response = await keylistQuery([mediatorDid], recipientDid);
+      let message: Message = response as Message;
+      let result: IMessage = message.as_value();
+      setResult(result);
+    } catch (err) {
+      setError(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
@@ -35,18 +40,18 @@ const KeylistQueryUI = () => {
       </Typography>
 
       <TextField
-        label="Recipient DID"
-        fullWidth
-        value={recipientDid}
-        onChange={(e) => setRecipientDid(e.target.value)}
-        margin="normal"
-      />
-
-      <TextField
         label="Mediator DID"
         fullWidth
         value={mediatorDid}
         onChange={(e) => setMediatorDid(e.target.value)}
+        margin="normal"
+      />
+
+      <TextField
+        label="Recipient DID"
+        fullWidth
+        value={recipientDid}
+        onChange={(e) => setRecipientDid(e.target.value)}
         margin="normal"
       />
 
@@ -57,7 +62,7 @@ const KeylistQueryUI = () => {
         disabled={isLoading}
         sx={{ marginTop: 2 }}
       >
-        Execute Query
+        {isLoading ? 'Querying...' : 'Execute Query'}
       </Button>
 
       {isLoading && (
@@ -69,7 +74,9 @@ const KeylistQueryUI = () => {
       {result && (
         <Box sx={{ marginTop: 2 }}>
           <Typography variant="h6">Query Result:</Typography>
-          <pre>{JSON.stringify(result, null, 2)}</pre>
+          <pre style={{ background: '#f4f4f4', padding: '10px' }}>
+            {JSON.stringify(result, null, 2)}
+          </pre>
         </Box>
       )}
 

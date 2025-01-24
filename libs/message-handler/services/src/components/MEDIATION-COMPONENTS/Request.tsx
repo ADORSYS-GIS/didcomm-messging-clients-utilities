@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './request.css';
+import mediationCoordination from '../../../../src/mediation-coordination';
 
 const MediateRequestUI: React.FC = () => {
   const [mediatorDid, setMediatorDid] = useState('');
@@ -10,30 +11,22 @@ const MediateRequestUI: React.FC = () => {
 
   const handleMediateRequest = async () => {
     setLoading(true);
-    setError(null);
     setResponse(null);
+    setError(null);
 
-    try {
-      const body = { mediatorDid, recipientDid };
-      const res = await fetch('http://localhost:3000/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/didcomm-encrypted+json',
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!res.ok) {
-        // throw new Error(`Request failed: ${res.statusText}`);
-      }
-
-      const data = await res.json();
-      setResponse(JSON.stringify(data, null, 2));
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+  try {
+    const response = await mediationCoordination(mediatorDid, recipientDid);
+    if (response) {
+      setResponse(JSON.stringify(response.as_value())); 
+    } else {
+      setResponse(null);
     }
+  } catch (err) {
+    setError(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  } finally {
+    setLoading(false);
+  }
+    
   };
 
   return (
