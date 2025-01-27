@@ -23,10 +23,16 @@ const ForwardMessageUI = () => {
     setResponse(null);
 
     try {
-      const result = await forward_msg([mediator_did],[recipient_did], message);
+      const result = await forward_msg(
+        [mediator_did],
+        [recipient_did],
+        message,
+      );
       setResponse(result);
     } catch (err) {
-      setError(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(
+        `Error: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      );
     } finally {
       setLoading(false);
     }

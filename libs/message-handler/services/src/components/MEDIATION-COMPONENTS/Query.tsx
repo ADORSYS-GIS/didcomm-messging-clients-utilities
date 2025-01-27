@@ -27,7 +27,9 @@ const KeylistQueryUI = () => {
       let result: IMessage = message.as_value();
       setResult(result);
     } catch (err) {
-      setError(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(
+        `Error: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      );
     } finally {
       setIsLoading(false);
     }

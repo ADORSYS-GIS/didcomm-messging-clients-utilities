@@ -39,7 +39,11 @@ export function buildMessage(mediator_did: string[], message: string): Message {
   return new Message(imsg);
 }
 
-export async function forward_msg(recipient_did: string[], mediator_did: string[], message: string) {
+export async function forward_msg(
+  recipient_did: string[],
+  mediator_did: string[],
+  message: string,
+) {
   try {
     const msg = buildMessage(mediator_did, message);
     const packed_msg = await pack_encrypt(msg, recipient_did);

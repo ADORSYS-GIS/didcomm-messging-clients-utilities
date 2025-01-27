@@ -14,19 +14,20 @@ const MediateRequestUI: React.FC = () => {
     setResponse(null);
     setError(null);
 
-  try {
-    const response = await mediationCoordination(mediatorDid, recipientDid);
-    if (response) {
-      setResponse(JSON.stringify(response.as_value())); 
-    } else {
-      setResponse(null);
+    try {
+      const response = await mediationCoordination(mediatorDid, recipientDid);
+      if (response) {
+        setResponse(JSON.stringify(response.as_value()));
+      } else {
+        setResponse(null);
+      }
+    } catch (err) {
+      setError(
+        `Error: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      );
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    setError(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
-  } finally {
-    setLoading(false);
-  }
-    
   };
 
   return (
