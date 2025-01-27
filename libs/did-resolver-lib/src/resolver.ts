@@ -1,5 +1,11 @@
 import { DIDDoc, DIDResolver, Service, VerificationMethod } from 'didcomm';
 import base64url from 'base64url';
+import { Buffer } from 'buffer';
+
+// Polyfill Buffer for environments like the browser
+if (!globalThis.Buffer) {
+  globalThis.Buffer = Buffer;
+}
 
 type Purpose =
   | 'Assertion'

@@ -28,24 +28,25 @@ import { CONTENT_TYPE, FROM, SERVICE_ENDPOINT } from './shared_data/constants';
 export default async function mediationCoordination(
   mediatorDid: string,
   recipient_did: string,
-): Promise<string | undefined> {
+): Promise<Message | undefined> {
   // Send a mediation request and receive the response
   const mediation_response: Message = await mediateRequest([mediatorDid]);
+  return mediation_response;
 
   // Extract the body from the mediation response
-  const message: IMessage = mediation_response.as_value();
+  // const message: IMessage = mediation_response.as_value();
 
-  // Retrieve the routing DID from the response body
-  const routing_did = message.body?.routing_did;
+  // // Retrieve the routing DID from the response body
+  // const routing_did = message.body?.routing_did;
 
-  // Update the keylist with the provided action and recipient DID
-  if (!routing_did) {
-    // Handle error if mediation is denied
-    throw new Error('Mediation Deny');
-  }
+  // // Update the keylist with the provided action and recipient DID
+  // if (!routing_did) {
+  //   // Handle error if mediation is denied
+  //   throw new Error('Mediation Deny');
+  // }
 
-  keylistUpdate(recipient_did, Action.add, [mediatorDid]);
-  return routing_did;
+  // keylistUpdate(recipient_did, Action.add, [mediatorDid]);
+  // return routing_did;
 }
 
 export async function buildMsg(
@@ -60,7 +61,7 @@ export async function buildMsg(
     body: body,
     from: FROM,
     to: mediatorDid,
-    headers: { return_route: 'all' },
+    return_route: 'all',
   };
   return val;
 }
@@ -162,23 +163,23 @@ export async function keylistUpdate(
 }
 
 export async function keylistQuery(
-  to: string,
-  recipient_did: string[],
+  mediator: string[],
+  _recipient: string,
 ): Promise<Message | null> {
   const body = {};
-  const msg = await buildMsg(recipient_did, KEYLIST_QUERY, body);
+  const msg = await buildMsg(mediator, KEYLIST_QUERY, body);
   const packed_msg = await packEncrypted(msg);
   const data = await sendRequest(packed_msg);
 
-  const unpackedMsg = unpack(data as string, [to]);
+  const unpackedMsg = unpack(data as string, mediator);
   return unpackedMsg;
 }
 
 export async function unpack(
   msg: string,
-  to: string[],
+  recipient: string[],
 ): Promise<Message | null> {
-  const resolve = await resolvers(to);
+  const resolve = await resolvers(recipient);
   const resolver = resolve as [DIDResolver, SecretsResolver];
   const did_resolver = resolver[0];
   const secret_resolver = resolver[1];
@@ -193,9 +194,9 @@ export async function unpack(
 }
 
 export async function resolvers(
-  to: string[],
+  mediator: string[],
 ): Promise<[DIDResolver, SecretsResolver] | null> {
-  const DIDDoc = await new PeerDIDResolver().resolve(to[0]);
+  const DIDDoc = await new PeerDIDResolver().resolve(mediator[0]);
   const CLIENT_DIDDoc = await new PeerDIDResolver().resolve(FROM);
   const did_resolver: DIDResolver = new ExampleDIDResolver([
     CLIENT_DIDDoc as DIDDoc,

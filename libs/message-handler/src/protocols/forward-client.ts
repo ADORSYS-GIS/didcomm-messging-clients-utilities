@@ -12,20 +12,19 @@ import {
   ExampleDIDResolver,
   ExampleSecretsResolver,
 } from 'did-resolver-lib';
-//import { FROM } from '../did_doc/client';
 import { ROUTING } from '../shared_data/message_types';
 import { CLIENT_SECRETS } from '../secrets/client';
 import { MEDIATOR_ENDPOINT } from '../shared_data/endpoints';
 import { CONTENT_TYPE, FROM } from '../shared_data/constants';
 
-export function buildMessage(to: string[], message: string): Message {
+export function buildMessage(mediator_did: string[], message: string): Message {
   const imsg: IMessage = {
     id: uuidv4(),
     typ: 'application/didcomm-plain+json',
     type: ROUTING,
     body: {},
     from: FROM,
-    to: to,
+    to: mediator_did,
     attachments: [
       {
         data: {
@@ -37,14 +36,22 @@ export function buildMessage(to: string[], message: string): Message {
       },
     ],
   };
-  const msg = new Message(imsg);
-  return msg;
+  return new Message(imsg);
 }
-export async function forward_msg(to: string[], message: string) {
-  const msg = buildMessage(to, message);
 
-  const packed_msg = await pack_encrypt(msg, to);
-  await sendRequest(packed_msg as string);
+export async function forward_msg(recipient_did: string[], mediator_did: string[], message: string) {
+  try {
+    const msg = buildMessage(mediator_did, message);
+    const packed_msg = await pack_encrypt(msg, recipient_did);
+    if (!packed_msg) {
+      throw new Error('Failed to pack and encrypt the message.');
+    }
+    const response = await sendRequest(packed_msg);
+    return response;
+  } catch (error) {
+    console.error('Error in forward_msg:', error);
+    throw error;
+  }
 }
 
 export async function pack_encrypt(
@@ -73,9 +80,11 @@ export async function pack_encrypt(
     );
     return result[0];
   } catch (error) {
+    console.error('Error in pack_encrypt:', error);
     throw new Error(error as string);
   }
 }
+
 export async function sendRequest(packed_msg: string) {
   try {
     const response = await axios.post(MEDIATOR_ENDPOINT, packed_msg, {
@@ -85,17 +94,14 @@ export async function sendRequest(packed_msg: string) {
     });
 
     if (response.status >= 200 && response.status < 300) {
-      if (response.data) {
-        return response.data;
-      } else {
-        return { message: 'Request was successful, no further data returned.' };
-      }
+      return response.data || 'Request was successful!';
     } else {
       throw new Error(
         `Unexpected response status: ${response.status}, Response data: ${JSON.stringify(response.data)}`,
       );
     }
   } catch (error) {
-    throw new Error(error as string);
+    console.error('Error in sendRequest:', error);
+    throw new Error(`Failed to send request: ${error}`);
   }
 }

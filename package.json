@@ -42,6 +42,7 @@
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^6.4.0",
     "base64url": "^3.0.1",
+    "buffer": "^6.0.3",
     "react-router-dom": "^7.1.1",
     "util": "^0.12.5",
     "uuid": "^11.0.5",

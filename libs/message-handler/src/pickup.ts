@@ -88,11 +88,23 @@ export async function pack_encrypt(
 
 // Function to send a pickup request
 export async function sendRequest(packmsg: string): Promise<string | null> {
-  const response = await axios.post(SERVICE_ENDPOINT, packmsg, {
-    headers: { 'Content-Type': 'application/didcomm-encrypted+json' },
-  });
-  const data = response.data;
-  return data;
+  console.log('Sending to:', SERVICE_ENDPOINT);
+  console.log('Packed message payload:', packmsg);
+
+  try {
+    const response = await axios.post(SERVICE_ENDPOINT, packmsg, {
+      headers: { 'Content-Type': 'application/didcomm-encrypted+json' },
+    });
+    console.log('Response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      'Request failed:',
+      error.response?.status,
+      error.response?.data,
+    );
+    throw error;
+  }
 }
 
 // Function to handle unpacking response
