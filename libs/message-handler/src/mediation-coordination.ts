@@ -33,20 +33,20 @@ export default async function mediationCoordination(
   const mediation_response: Message = await mediateRequest([mediatorDid]);
   return mediation_response;
 
-  // Extract the body from the mediation response
-  // const message: IMessage = mediation_response.as_value();
+  //Extract the body from the mediation response
+  const message: IMessage = mediation_response.as_value();
 
-  // // Retrieve the routing DID from the response body
-  // const routing_did = message.body?.routing_did;
+  // Retrieve the routing DID from the response body
+  const routing_did = message.body?.routing_did;
 
-  // // Update the keylist with the provided action and recipient DID
-  // if (!routing_did) {
-  //   // Handle error if mediation is denied
-  //   throw new Error('Mediation Deny');
-  // }
+  // Update the keylist with the provided action and recipient DID
+  if (!routing_did) {
+    // Handle error if mediation is denied
+    throw new Error('Mediation Deny');
+  }
 
-  // keylistUpdate(recipient_did, Action.add, [mediatorDid]);
-  // return routing_did;
+  keylistUpdate(recipient_did, Action.add, [mediatorDid]);
+  return routing_did;
 }
 
 export async function buildMsg(
@@ -164,7 +164,6 @@ export async function keylistUpdate(
 
 export async function keylistQuery(
   mediator: string[],
-  _recipient: string,
 ): Promise<Message | null> {
   const body = {};
   const msg = await buildMsg(mediator, KEYLIST_QUERY, body);
