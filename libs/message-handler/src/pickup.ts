@@ -100,8 +100,8 @@ export async function sendRequest(packmsg: string): Promise<string | null> {
   } catch (error) {
     console.error(
       'Request failed:',
-      error.response?.status,
-      error.response?.data,
+      // error.response?.status,
+      // error.response?.data,
     );
     throw error;
   }

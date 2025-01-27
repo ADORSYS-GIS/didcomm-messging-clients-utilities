@@ -22,7 +22,7 @@ const KeylistQueryUI = () => {
     setError(null);
 
     try {
-      const response = await keylistQuery([mediatorDid], recipientDid);
+      const response = await keylistQuery([mediatorDid]);
       const message: Message = response as Message;
       const result: IMessage = message.as_value();
       setResult(result);
