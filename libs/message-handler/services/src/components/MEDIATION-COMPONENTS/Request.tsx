@@ -15,7 +15,7 @@ const MediateRequestUI: React.FC = () => {
     setError(null);
 
     try {
-      const response = await mediationCoordination(mediatorDid, recipientDid);
+      const response = await mediationCoordination(mediatorDid,);
       if (response) {
         setResponse(JSON.stringify(response.as_value()));
       } else {

@@ -27,26 +27,25 @@ import { CONTENT_TYPE, FROM, SERVICE_ENDPOINT } from './shared_data/constants';
  **/
 export default async function mediationCoordination(
   mediatorDid: string,
-  recipient_did: string,
 ): Promise<Message | undefined> {
   // Send a mediation request and receive the response
   const mediation_response: Message = await mediateRequest([mediatorDid]);
   return mediation_response;
 
-  //Extract the body from the mediation response
-  const message: IMessage = mediation_response.as_value();
+  // //Extract the body from the mediation response
+  // const message: IMessage = mediation_response.as_value();
 
-  // Retrieve the routing DID from the response body
-  const routing_did = message.body?.routing_did;
+  // // Retrieve the routing DID from the response body
+  // const routing_did = message.body?.routing_did;
 
-  // Update the keylist with the provided action and recipient DID
-  if (!routing_did) {
-    // Handle error if mediation is denied
-    throw new Error('Mediation Deny');
-  }
+  // // Update the keylist with the provided action and recipient DID
+  // if (!routing_did) {
+  //   // Handle error if mediation is denied
+  //   throw new Error('Mediation Deny');
+  // }
 
-  keylistUpdate(recipient_did, Action.add, [mediatorDid]);
-  return routing_did;
+  // keylistUpdate(recipient_did, Action.add, [mediatorDid]);
+  // return routing_did;
 }
 
 export async function buildMsg(
@@ -123,21 +122,26 @@ export async function mediateRequest(mediatorDid: string[]): Promise<Message> {
   return unpackedMsg as Message;
 }
 export async function sendRequest(msg: string): Promise<string | null> {
-  const data = fetch(SERVICE_ENDPOINT, {
-    method: 'POST',
-    body: msg,
-    headers: {
-      'Content-Type': CONTENT_TYPE,
-    },
-  })
-    .then((response) => {
-      const data = response.text();
-      return data;
-    })
-    .catch((error) => {
-      throw Error('Error sending didcomm request' + error);
+  try {
+    const response = await fetch(SERVICE_ENDPOINT, {
+      method: 'POST',
+      body: msg,
+      headers: {
+        'Content-Type': CONTENT_TYPE,
+      },
     });
-  return data;
+
+    if (!response.ok) {
+      throw new Error(
+        `Request failed with status ${response.status}: ${await response.text()}`,
+      );
+    }
+
+    return await response.text();
+  } catch (error) {
+    console.error('Error sending DIDComm request:', error);
+    throw error;
+  }
 }
 
 export async function keylistUpdate(
@@ -166,11 +170,22 @@ export async function keylistQuery(
   mediator: string[],
 ): Promise<Message | null> {
   const body = {};
-  const msg = await buildMsg(mediator, KEYLIST_QUERY, body);
-  const packed_msg = await packEncrypted(msg);
-  const data = await sendRequest(packed_msg);
+  console.log('Building keylist query message...');
 
-  const unpackedMsg = unpack(data as string, mediator);
+  const msg = await buildMsg(mediator, KEYLIST_QUERY, body);
+  console.log('Built message:', JSON.stringify(msg));
+
+  const packed_msg = await packEncrypted(msg);
+  console.log('Packed message:', packed_msg);
+
+  const data = await sendRequest(packed_msg);
+  console.log('Mediator response:', data);
+
+  if (!data) throw new Error('Mediator returned an empty response.');
+
+  const unpackedMsg = await unpack(data as string, mediator);
+  console.log('Unpacked message:', unpackedMsg);
+
   return unpackedMsg;
 }
 
