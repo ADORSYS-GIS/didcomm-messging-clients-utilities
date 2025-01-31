@@ -5,8 +5,8 @@ import MediatorApp from './data-collection';
 import MediatorCoordination from './components/MediatorCoordination';
 import PickupComponent from './components/PickupRequest';
 import ForwardComponent from './components/ForwardRequest';
-import QueryComponent from './components/MEDIATION-COMPONENTS/Query';
-import RequestComponent from './components/MEDIATION-COMPONENTS/Request';
+import QueryComponent from './components/Mediation-components/Query';
+import RequestComponent from './components/Mediation-components/Request';
 
 const App: React.FC = () => {
   return (

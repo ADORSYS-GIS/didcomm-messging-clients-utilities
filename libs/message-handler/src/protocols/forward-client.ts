@@ -1,3 +1,4 @@
+// import  {ap_in_forward } from didcomm
 import {
   DIDDoc,
   DIDResolver,
@@ -72,7 +73,7 @@ export async function pack_encrypt(
   );
 
   try {
-    const result = await msg.pack_encrypted(
+    const packed_msg = await msg.pack_encrypted(
       to[0],
       FROM,
       null,
@@ -82,7 +83,17 @@ export async function pack_encrypt(
         forward: true,
       },
     );
-    return result[0];
+
+    // let message = await wrap_in_forward.Message.wrap_in_forward(
+    //   packed_msg[0],
+    //   {},
+    //   to[0],
+    //   [], // routing did
+    //   '',
+    //   did_resolver,
+    // );
+
+    return packed_msg[0];
   } catch (error) {
     console.error('Error in pack_encrypt:', error);
     throw new Error(error as string);

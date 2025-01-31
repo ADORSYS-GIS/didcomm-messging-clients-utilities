@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import QueryComponent from './MEDIATION-COMPONENTS/Query';
-import RequestComponent from './MEDIATION-COMPONENTS/Request';
+import QueryComponent from './Mediation-components/Query';
+import RequestComponent from './Mediation-components/Request';
 
 const MediatorCoordination: React.FC = () => {
   const navigate = useNavigate();

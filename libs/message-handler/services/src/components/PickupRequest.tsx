@@ -4,13 +4,14 @@ import {
   pickupDelivery,
   pickupReceive,
 } from '../../../src/pickup';
-import { Message } from 'didcomm';
+import './pickup.css';
+import { IMessage } from 'didcomm';
 
 export default function DidCommUI() {
   const [to, setTo] = useState('');
   const [recipientDid, setRecipientDid] = useState('');
   const [messageType, setMessageType] = useState('Pickup Request');
-  const [response, setResponse] = useState<Message | null>(null);
+  const [response, setResponse] = useState<IMessage | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSend = async () => {
@@ -24,80 +25,85 @@ export default function DidCommUI() {
           result = await pickupRequest(to, recipientDid);
           break;
         case 'Pickup Delivery':
-          result = await pickupDelivery(to, recipientDid);
+          result = await pickupDelivery(to, recipientDid, 10);
           break;
         case 'Pickup Receive':
-          result = await pickupReceive(to, recipientDid);
+          result = await pickupReceive(to, recipientDid, [
+            '6689601fd2d92bb3cd451b2c',
+            '6389601fd2d92bb3cd451b2d',
+          ]);
           break;
         default:
           throw new Error('Invalid message type selected');
       }
-      setResponse(result);
+      setResponse(result.as_value());
     } catch (error) {
-      setResponse({ error: error.message });
+      console.error('Error:', error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto bg-white rounded-xl shadow-lg space-y-4">
-      <h1 className="text-xl font-bold text-gray-800">
-        DIDComm Message pickup
-      </h1>
-      <div className="space-y-3">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">To</label>
-          <input
-            type="text"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-            placeholder="Recipient's DID"
-            className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
+    <div className="container">
+      <div className="card">
+        <h1 className="title">DIDComm Message Pickup</h1>
+
+        <div className="space-y-4 mt-4">
+          {/* Recipient DID */}
+          <div>
+            <label className="label">To</label>
+            <input
+              type="text"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              placeholder="Enter recipient's DID"
+              className="input"
+            />
+          </div>
+
+          {/* Sender DID */}
+          <div>
+            <label className="label">Recipient DID</label>
+            <input
+              type="text"
+              value={recipientDid}
+              onChange={(e) => setRecipientDid(e.target.value)}
+              placeholder="Enter sender's DID"
+              className="input"
+            />
+          </div>
+
+          {/* Message Type Selection */}
+          <div>
+            <label className="label">Message Type</label>
+            <select
+              value={messageType}
+              onChange={(e) => setMessageType(e.target.value)}
+              className="select"
+            >
+              <option>Pickup Request</option>
+              <option>Pickup Delivery</option>
+              <option>Pickup Receive</option>
+            </select>
+          </div>
+
+          {/* Send Button */}
+          <button onClick={handleSend} className="button" disabled={loading}>
+            {loading ? 'Sending...' : 'Send Message'}
+          </button>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Recipient DID
-          </label>
-          <input
-            type="text"
-            value={recipientDid}
-            onChange={(e) => setRecipientDid(e.target.value)}
-            placeholder="Recipient's DID"
-            className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Message Type
-          </label>
-          <select
-            value={messageType}
-            onChange={(e) => setMessageType(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option>Pickup Request</option>
-            <option>Pickup Delivery</option>
-            <option>Pickup Receive</option>
-          </select>
-        </div>
-        <button
-          onClick={handleSend}
-          className="w-full bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
-          disabled={loading}
-        >
-          {loading ? 'Sending...' : 'Send Message'}
-        </button>
+
+        {/* Response Box */}
+        {response && (
+          <div className="response-box">
+            <h2 className="response-title">Response</h2>
+            <pre className="response-text">
+              {JSON.stringify(response, null, 2)}
+            </pre>
+          </div>
+        )}
       </div>
-      {response && (
-        <div className="mt-4 p-4 bg-gray-100 rounded-lg">
-          <h2 className="text-lg font-semibold text-gray-800">Response</h2>
-          <pre className="text-sm text-gray-700 overflow-auto">
-            {JSON.stringify(response, null, 2)}
-          </pre>
-        </div>
-      )}
     </div>
   );
 }

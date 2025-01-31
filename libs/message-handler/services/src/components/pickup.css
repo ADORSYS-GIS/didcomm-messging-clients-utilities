@@ -1,0 +1,124 @@
+/* Container */
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f3f4f6;
+  padding: 1rem;
+}
+
+.dark .container {
+  background-color: #1a202c;
+}
+
+/* Card */
+.card {
+  width: 100%;
+  max-width: 28rem;
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dark .card {
+  background-color: #2d3748;
+}
+
+/* Title */
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2d3748;
+  text-align: center;
+}
+
+.dark .title {
+  color: white;
+}
+
+/* Form Inputs */
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4a5568;
+  margin-bottom: 0.25rem;
+}
+
+.dark .label {
+  color: #cbd5e0;
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 0.5rem;
+  background-color: white;
+  color: black;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.dark .input,
+.dark .select {
+  background-color: #4a5568;
+  color: white;
+  border-color: #718096;
+}
+
+/* Button */
+.button {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s;
+  color: white;
+  background-color: #2563eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.button:hover {
+  background-color: #1e40af;
+}
+
+.button:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+}
+
+/* Response Box */
+.response-box {
+  padding: 1rem;
+  margin-top: 1rem;
+  background-color: #edf2f7;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.dark .response-box {
+  background-color: #4a5568;
+}
+
+.response-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.dark .response-title {
+  color: white;
+}
+
+.response-text {
+  font-size: 0.875rem;
+  color: #4a5568;
+  word-break: break-word;
+}
+
+.dark .response-text {
+  color: #e2e8f0;
+}

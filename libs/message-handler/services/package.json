@@ -21,6 +21,7 @@
     "vite": "^6.0.5"
   },
   "dependencies": {
+    "didcomm": "^0.4.1",
     "message-handler": "^0.0.17",
     "uuid": "^11.0.5",
     "uuidv4": "^6.2.13"
