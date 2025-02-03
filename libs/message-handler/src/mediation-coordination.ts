@@ -31,7 +31,6 @@ export default async function mediationCoordination(
   // Send a mediation request and receive the response
   const mediation_response: Message = await mediateRequest([mediatorDid]);
   return mediation_response;
-
 }
 
 export async function buildMsg(
