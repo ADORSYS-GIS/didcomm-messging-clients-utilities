@@ -1,11 +1,11 @@
 import { DIDDoc, IMessage, Message } from 'didcomm';
 import { DIDResolver, SecretsResolver } from 'didcomm';
-import { uuid as uuidv4 } from 'uuidv4';
 import {
   ExampleDIDResolver,
   ExampleSecretsResolver,
   PeerDIDResolver,
 } from 'did-resolver-lib';
+import { v4 as uuidv4 } from 'uuid';
 
 enum Action {
   add = 'add',
@@ -27,25 +27,10 @@ import { CONTENT_TYPE, FROM, SERVICE_ENDPOINT } from './shared_data/constants';
  **/
 export default async function mediationCoordination(
   mediatorDid: string,
-  recipient_did: string,
-): Promise<string | undefined> {
+): Promise<Message | undefined> {
   // Send a mediation request and receive the response
   const mediation_response: Message = await mediateRequest([mediatorDid]);
-
-  // Extract the body from the mediation response
-  const message: IMessage = mediation_response.as_value();
-
-  // Retrieve the routing DID from the response body
-  const routing_did = message.body?.routing_did;
-
-  // Update the keylist with the provided action and recipient DID
-  if (!routing_did) {
-    // Handle error if mediation is denied
-    throw new Error('Mediation Deny');
-  }
-
-  keylistUpdate(recipient_did, Action.add, [mediatorDid]);
-  return routing_did;
+  return mediation_response;
 }
 
 export async function buildMsg(
@@ -60,7 +45,7 @@ export async function buildMsg(
     body: body,
     from: FROM,
     to: mediatorDid,
-    headers: { return_route: 'all' },
+    return_route: 'all',
   };
   return val;
 }
@@ -122,21 +107,26 @@ export async function mediateRequest(mediatorDid: string[]): Promise<Message> {
   return unpackedMsg as Message;
 }
 export async function sendRequest(msg: string): Promise<string | null> {
-  const data = fetch(SERVICE_ENDPOINT, {
-    method: 'POST',
-    body: msg,
-    headers: {
-      'Content-Type': CONTENT_TYPE,
-    },
-  })
-    .then((response) => {
-      const data = response.text();
-      return data;
-    })
-    .catch((error) => {
-      throw Error('Error sending didcomm request' + error);
+  try {
+    const response = await fetch(SERVICE_ENDPOINT, {
+      method: 'POST',
+      body: msg,
+      headers: {
+        'Content-Type': CONTENT_TYPE,
+      },
     });
-  return data;
+
+    if (!response.ok) {
+      throw new Error(
+        `Request failed with status ${response.status}: ${await response.text()}`,
+      );
+    }
+
+    return await response.text();
+  } catch (error) {
+    console.error('Error sending DIDComm request:', error);
+    throw error;
+  }
 }
 
 export async function keylistUpdate(
@@ -162,23 +152,33 @@ export async function keylistUpdate(
 }
 
 export async function keylistQuery(
-  to: string,
-  recipient_did: string[],
+  mediator: string[],
 ): Promise<Message | null> {
   const body = {};
-  const msg = await buildMsg(recipient_did, KEYLIST_QUERY, body);
-  const packed_msg = await packEncrypted(msg);
-  const data = await sendRequest(packed_msg);
+  console.log('Building keylist query message...');
 
-  const unpackedMsg = unpack(data as string, [to]);
+  const msg = await buildMsg(mediator, KEYLIST_QUERY, body);
+  console.log('Built message:', JSON.stringify(msg));
+
+  const packed_msg = await packEncrypted(msg);
+  console.log('Packed message:', packed_msg);
+
+  const data = await sendRequest(packed_msg);
+  console.log('Mediator response:', data);
+
+  if (!data) throw new Error('Mediator returned an empty response.');
+
+  const unpackedMsg = await unpack(data as string, mediator);
+  console.log('Unpacked message:', unpackedMsg);
+
   return unpackedMsg;
 }
 
 export async function unpack(
   msg: string,
-  to: string[],
+  recipient: string[],
 ): Promise<Message | null> {
-  const resolve = await resolvers(to);
+  const resolve = await resolvers(recipient);
   const resolver = resolve as [DIDResolver, SecretsResolver];
   const did_resolver = resolver[0];
   const secret_resolver = resolver[1];
@@ -193,9 +193,9 @@ export async function unpack(
 }
 
 export async function resolvers(
-  to: string[],
+  mediator: string[],
 ): Promise<[DIDResolver, SecretsResolver] | null> {
-  const DIDDoc = await new PeerDIDResolver().resolve(to[0]);
+  const DIDDoc = await new PeerDIDResolver().resolve(mediator[0]);
   const CLIENT_DIDDoc = await new PeerDIDResolver().resolve(FROM);
   const did_resolver: DIDResolver = new ExampleDIDResolver([
     CLIENT_DIDDoc as DIDDoc,
